@@ -26,6 +26,24 @@
     <%_ if (searchEngine === 'elasticsearch') { _%>
 
     private final <%= entityClass %>SearchRepository <%= entityInstance %>SearchRepository;
+
+    <%_ for (idx in relationships) {
+        const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+        const relationshipFieldName = relationships[idx].relationshipFieldName;
+        const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+        const relationshipType = relationships[idx].relationshipType;
+
+        const otherEntityName = relationships[idx].otherEntityName;
+        const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+        const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+        const ownerSide = relationships[idx].ownerSide; _%>
+
+    <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+        private final <%= otherEntityNameCapitalized %>SearchRepository <%= otherEntityName %>SearchRepository;
+        private final <%= otherEntityNameCapitalized %>Mapper <%= otherEntityName %>Mapper;
+    <%_ } _%>
+    <%_ } _%>
+
     <%_ } _%>
 <%_  } else { _%>
 
@@ -36,7 +54,22 @@
     <%_ } _%>
 <%_ } _%>
 
-    public <%= constructorName %>(<% if (!viaService) { %><%= entityClass %>Repository <%= entityInstance %>Repository<% if (dto === 'mapstruct') { %>, <%= entityClass %>Mapper <%= entityInstance %>Mapper<% } %><% if (searchEngine === 'elasticsearch') { %>, <%= entityClass %>SearchRepository <%= entityInstance %>SearchRepository<% } %><%  } else { %><%= entityClass %>Service <%= entityInstance %>Service<% } %><% if (queryService && viaService) { %>, <%= entityClass %>QueryService <%= entityInstance %>QueryService<% } %>) {
+    public <%= constructorName %>(<% if (!viaService) { %><%= entityClass %>Repository <%= entityInstance %>Repository<% if (dto === 'mapstruct') { %>, <%= entityClass %>Mapper <%= entityInstance %>Mapper<% } %><% if (searchEngine === 'elasticsearch') { %>, <%= entityClass %>SearchRepository <%= entityInstance %>SearchRepository<% } %><%  } else { %><%= entityClass %>Service <%= entityInstance %>Service<% } %><% if (queryService && viaService) { %>, <%= entityClass %>QueryService <%= entityInstance %>QueryService<% } %> _%>
+    <% if (!viaService && searchEngine === 'elasticsearch') { %><%_ for (idx in relationships) {
+const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+const relationshipFieldName = relationships[idx].relationshipFieldName;
+const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+const relationshipType = relationships[idx].relationshipType;
+
+const otherEntityName = relationships[idx].otherEntityName;
+const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+const ownerSide = relationships[idx].ownerSide; _%>
+<%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+,<%= otherEntityNameCapitalized %>SearchRepository <%= otherEntityName %>SearchRepository,<%= otherEntityNameCapitalized %>Mapper  <%= otherEntityName %>Mapper
+<%_ } _%>
+<%_ } _%>
+<%_ } _%>) {
         <%_ if (!viaService) { _%>
         this.<%= entityInstance %>Repository = <%= entityInstance %>Repository;
             <%_ if (dto === 'mapstruct') { _%>
@@ -44,11 +77,28 @@
             <%_ } _%>
             <%_ if (searchEngine === 'elasticsearch') { _%>
         this.<%= entityInstance %>SearchRepository = <%= entityInstance %>SearchRepository;
+        <%_ for (idx in relationships) {
+                                 const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+                                 const relationshipFieldName = relationships[idx].relationshipFieldName;
+                                 const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                                 const relationshipType = relationships[idx].relationshipType;
+
+                                 const otherEntityName = relationships[idx].otherEntityName;
+                                 const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                                 const ownerSide = relationships[idx].ownerSide; _%>
+                                 <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+                                    this.<%= otherEntityName %>SearchRepository = <%= otherEntityName %>SearchRepository;
+                                     this.<%= otherEntityName %>Mapper = <%= otherEntityName %>Mapper;
+                                 <%_ } _%>
+                                 <%_ } _%>
             <%_ } _%>
         <%_  } else { _%>
         this.<%= entityInstance %>Service = <%= entityInstance %>Service;
             <%_ if (queryService) {  _%>
         this.<%= entityInstance %>QueryService = <%= entityInstance %>QueryService;
             <%_ } _%>
+
         <%_ } _%>
+
     }

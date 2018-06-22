@@ -21,6 +21,7 @@ package <%=packageName%>.service;
     const instanceName = (dto === 'mapstruct') ? entityInstance + 'DTO' : entityInstance; %>
 <%_ if (dto === 'mapstruct') { _%>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>SearchDTO;
 <%_ } else { _%>
 import <%=packageName%>.domain.<%= entityClass %>;
 <%_ } _%>
@@ -84,5 +85,9 @@ public interface <%= entityClass %>Service {
      * @param pageable the pagination information<% } %>
      * @return the list of entities
      */
-    <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> search(String query<% if (pagination !== 'no') { %>, Pageable pageable<% } %>);<% } %>
-}
+    <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> search(String query<% if (pagination !== 'no') { %>, Pageable pageable<% } %>);
+
+    <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> searchExample( <%= entityClass %>SearchDTO searchDTO<% if (pagination !== 'no') { %>, Pageable pageable<% } %>);
+    <% } %>
+
+    }

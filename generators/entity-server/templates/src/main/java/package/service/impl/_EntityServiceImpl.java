@@ -33,9 +33,29 @@ import <%=packageName%>.domain.<%= entityClass %>;
 import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEngine === 'elasticsearch') { %>
 import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;<% } if (dto === 'mapstruct') { %>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>SearchDTO;
+import org.springframework.data.domain.PageImpl;
+<%_ for (idx in relationships) {
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const relationshipType = relationships[idx].relationshipType;
+
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const ownerSide = relationships[idx].ownerSide; _%>
+<%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+    import <%=packageName%>.domain.<%= otherEntityNameCapitalized %>;
+<%_ } _%>
+<%_ } _%>
 import <%=packageName%>.service.mapper.<%= entityClass %>Mapper;<% } %>
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+    import java.util.stream.StreamSupport;
+
+    import java.util.List;
+    import java.util.stream.Collectors;
 <%_ if (pagination !== 'no') { _%>
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +65,34 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 <%_ } _%>
 <% if (dto === 'mapstruct' && (pagination === 'no' ||  fieldsContainNoOwnerOneToOne === true)) { %>
-import java.util.LinkedList;<% } %><% if (pagination === 'no' ||  fieldsContainNoOwnerOneToOne === true) { %>
-import java.util.List;<% } %><% if (databaseType === 'cassandra') { %>
+import java.util.LinkedList;<% } %><% if (pagination === 'no' ||  fieldsContainNoOwnerOneToOne === true) { %><% } %><% if (databaseType === 'cassandra') { %>
 import java.util.UUID;<% } %><% if (fieldsContainNoOwnerOneToOne === true || (pagination === 'no' && ((searchEngine === 'elasticsearch' && !viaService) || dto === 'mapstruct'))) { %>
 import java.util.stream.Collectors;<% } %><% if (fieldsContainNoOwnerOneToOne === true || (pagination === 'no' && searchEngine === 'elasticsearch' && !viaService)) { %>
-import java.util.stream.StreamSupport;<% } %><% if (searchEngine === 'elasticsearch') { %>
+<% } %><% if (searchEngine === 'elasticsearch') { %>
+<%_ for (idx in relationships) {
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const relationshipType = relationships[idx].relationshipType;
 
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const ownerSide = relationships[idx].ownerSide; _%>
+
+<%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+    import <%=packageName%>.repository.search.<%= otherEntityNameCapitalized %>SearchRepository;
+    <%_ if (dto === 'mapstruct'){ _%>
+    import <%=packageName%>.service.mapper.<%= otherEntityNameCapitalized %>Mapper;
+<%_ } _%>
+<%_ } _%>
+<%_ } _%>
+    import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.elasticsearch.index.query.QueryBuilders;
 import static org.elasticsearch.index.query.QueryBuilders.*;<% } %>
 
 /**
@@ -155,4 +197,54 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
         <%_ } } _%>
     }
     <%_ } _%>
+
+
+
+<%_ if (service === 'serviceImpl') { _%>
+    @Override
+    <%_ } _%>
+    <%_ if (databaseType === 'sql') { _%>
+    @Transactional(readOnly = true)
+    <%_ } _%>
+    public <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> searchExample(<%= entityClass %>SearchDTO searchDto<% if (pagination !== 'no') { %>, Pageable pageable<% } %>) {
+            NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+            <%_ for (idx in fields) {
+                const fieldType = fields[idx].fieldType;
+                const fieldTypeBlobContent = fields[idx].fieldTypeBlobContent;
+                const fieldInJavaBeanMethod = fields[idx].fieldInJavaBeanMethod;
+                const fieldName = fields[idx].fieldName; _%>
+            <%_ if(fieldType === 'String') { _%>
+            if(StringUtils.isNotBlank(searchDto.get<%=fieldInJavaBeanMethod%>())) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery("<%=fieldName%>", "*"+searchDto.get<%=fieldInJavaBeanMethod%>()+"*"));
+            }
+            <%_ } _%>
+            <%_ } _%>
+            SearchQuery  query = nativeSearchQueryBuilder.withQuery(boolQueryBuilder).withPageable(pageable).build();
+            Page<<%= entityClass %>> <%= entityInstance %>Page= <%= entityInstance %>SearchRepository.search(query);
+            List<<%= instanceType %>> <%= entityInstance %>List =  StreamSupport
+            .stream(<%= entityInstance %>Page.spliterator(), false)
+            .map(<%= entityInstance %>Mapper::toDto)
+            .collect(Collectors.toList());
+            <%= entityInstance %>List.forEach(<%= entityInstance %>Dto -> {
+            <%_ for (idx in relationships) {
+                const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+                const relationshipFieldName = relationships[idx].relationshipFieldName;
+                const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                const relationshipType = relationships[idx].relationshipType;
+
+                const otherEntityName = relationships[idx].otherEntityName;
+                const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                const ownerSide = relationships[idx].ownerSide; _%>
+            <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+            if(<%= entityInstance %>Dto.get<%= otherEntityNameCapitalized %>Id()!=null) {
+                <%=otherEntityNameCapitalized %> <%=otherEntityName %>= <%=otherEntityName %>SearchRepository.findOne(<%= entityInstance %>Dto.get<%=otherEntityNameCapitalized %>Id());
+                <%= entityInstance %>Dto.set<%=otherEntityNameCapitalized %>DTO(<%=otherEntityName %>Mapper.toDto(<%=otherEntityName %>));
+            <%_ } _%>
+            <%_ } _%>
+            }
+            });
+            return new PageImpl<>(<%= entityInstance %>List,pageable,<%= entityInstance %>Page.getTotalElements());
+        }
 }

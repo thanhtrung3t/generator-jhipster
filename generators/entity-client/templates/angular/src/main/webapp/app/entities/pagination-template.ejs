@@ -43,6 +43,24 @@ currentAccount: any;
     predicate: any;
     previousPage: any;
     reverse: any;
+    <%= entityFileName %>Search : <%= entityAngularName %>Search;
+    <%_ for (idx in relationships) {
+        const relationshipType = relationships[idx].relationshipType;
+        const ownerSide = relationships[idx].ownerSide;
+        const otherEntityName = relationships[idx].otherEntityName;
+        const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+        const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+        const relationshipName = relationships[idx].relationshipName;
+        const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+        const relationshipFieldName = relationships[idx].relationshipFieldName;
+        const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+        const otherEntityField = relationships[idx].otherEntityField;
+        const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+        const relationshipRequired = relationships[idx].relationshipRequired; _%>
+
+    <%= otherEntityNamePlural %> : <%=otherEntityNameCapitalized %>[];
+    <%_ } _%>
+    @ViewChild(NgForm) searchForm: NgForm;
     <%_ } _%>
 
     constructor(
@@ -55,7 +73,24 @@ currentAccount: any;
         private dataUtils: JhiDataUtils,
         <%_ } _%>
         private router: Router,
-        private eventManager: JhiEventManager
+        private eventManager: JhiEventManager,
+        <%_ for (idx in relationships) {
+            const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired; _%>
+        private <%= otherEntityName %>Service: <%= otherEntityNameCapitalized %>Service,
+        <%_ } _%>
+
+        private <%= entityInstance %>PopupService: <%= entityAngularName %>PopupService
     ) {
         <%_ if (databaseType !== 'cassandra') { _%>
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -64,7 +99,26 @@ currentAccount: any;
             this.previousPage = data.pagingParams.page;
             this.reverse = data.pagingParams.ascending;
             this.predicate = data.pagingParams.predicate;
+
         });
+        <%_ for (idx in relationships) {
+                const relationshipType = relationships[idx].relationshipType;
+                const ownerSide = relationships[idx].ownerSide;
+                const otherEntityName = relationships[idx].otherEntityName;
+                const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                const relationshipName = relationships[idx].relationshipName;
+                const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+                const relationshipFieldName = relationships[idx].relationshipFieldName;
+                const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                const otherEntityField = relationships[idx].otherEntityField;
+                const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                const relationshipRequired = relationships[idx].relationshipRequired; _%>
+         this.<%= otherEntityNamePlural %> =[];
+       <%_ } _%>
+
+        this.<%= entityFileName %>Search = new <%= entityAngularName %>Search();
+
         <%_ if (searchEngine === 'elasticsearch') { _%>
         this.currentSearch = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['search'] ?
             this.activatedRoute.snapshot.params['search'] : '';
@@ -74,25 +128,35 @@ currentAccount: any;
 
     loadAll() {
         <%_ if (searchEngine === 'elasticsearch') { _%>
-        if (this.currentSearch) {
-            this.<%= entityInstance %>Service.search({
-                page: this.page - 1,
-                query: this.currentSearch,
-                size: this.itemsPerPage,
-                sort: this.sort()}).subscribe(
-                    (res: HttpResponse<<%= entityAngularName %>[]>) => this.onSuccess(res.body, res.headers),
-                    (res: HttpErrorResponse) => this.onError(res.message)
-                );
-            return;
-        }
-        <%_ } _%>
-        this.<%= entityInstance %>Service.query(<%_ if (databaseType !== 'cassandra') { _%>{
-            page: this.page - 1,
-            size: this.itemsPerPage,
-            sort: this.sort()}<%_ } _%>).subscribe(
-                (res: HttpResponse<<%= entityAngularName %>[]>) => this.onSuccess(res.body, res.headers),
-                (res: HttpErrorResponse) => this.onError(res.message)
+         var obj = {
+         page: this.page -1,
+         size: this.itemsPerPage,
+         sort: this.sort(),
+          <%_ for (idx in fields) {
+             const fieldName = fields[idx].fieldName;
+             const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+          _%>
+         <%= fieldName %> : this.<%= entityFileName %>Search.<%= fieldName %>,
+          <%_ } _%>
+          <%_ for (idx in relationships) {
+              const relationshipType = relationships[idx].relationshipType;
+              const ownerSide = relationships[idx].ownerSide;
+              const otherEntityName = relationships[idx].otherEntityName;
+              const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+              const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+              const relationshipFieldName = relationships[idx].relationshipFieldName;
+              const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+          _%>
+           <%= relationshipFieldName %>Id : this.<%= entityFileName %>Search.<%= relationshipFieldName %>Id,
+            <%_ } _%>
+         };
+
+        this.<%= entityFileName %>Service.searchExample(obj).subscribe(
+          (res: HttpResponse<District[]>) => this.onSuccess(res.body, res.headers),
+          (res: HttpErrorResponse) => this.onError(res.message)
         );
+        <%_ } _%>
+
     }
     <%_ if (databaseType !== 'cassandra') { _%>
     loadPage(page: number) {
@@ -108,6 +172,23 @@ currentAccount: any;
                 size: this.itemsPerPage,
                 <%_ if (searchEngine === 'elasticsearch') { _%>
                 search: this.currentSearch,
+             <%_ for (idx in fields) {
+                 const fieldName = fields[idx].fieldName;
+                 const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+              _%>
+                <%= fieldName %> : this.<%= entityFileName %>Search.<%= fieldName %>,
+              <%_ } _%>
+              <%_ for (idx in relationships) {
+                  const relationshipType = relationships[idx].relationshipType;
+                  const ownerSide = relationships[idx].ownerSide;
+                  const otherEntityName = relationships[idx].otherEntityName;
+                  const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                  const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                  const relationshipFieldName = relationships[idx].relationshipFieldName;
+                  const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+              _%>
+                <%= relationshipFieldName %>Id : this.<%= entityFileName %>Search.<%= relationshipFieldName %>Id,
+              <%_ } _%>
                 <%_ } _%>
                 sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
             }

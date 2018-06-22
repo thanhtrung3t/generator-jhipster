@@ -36,12 +36,13 @@ import { createRequestOption } from '../../shared';
 
 export type EntityResponseType = HttpResponse<<%= entityAngularName %>>;
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class <%= entityAngularName %>Service {
 
     private resourceUrl =  SERVER_API_URL + '<% if (applicationType === 'gateway' && locals.microserviceName) { %><%= microserviceName.toLowerCase() %>/<% } %>api/<%= entityApiUrl %>';
     <%_ if(searchEngine === 'elasticsearch') { _%>
     private resourceSearchUrl = SERVER_API_URL + '<% if (applicationType === 'gateway' && locals.microserviceName) { %><%= microserviceName.toLowerCase() %>/<% } %>api/_search/<%= entityApiUrl %>';
+    private resourceSearchExampleUrl = SERVER_API_URL + '<% if (applicationType === 'gateway' && locals.microserviceName) { %><%= microserviceName.toLowerCase() %>/<% } %>api/_search_example/<%= entityApiUrl %>';
     <%_ } _%>
 
     constructor(private http: HttpClient<% if (hasDate) { %>, private dateUtils: JhiDateUtils<% } %>) { }
@@ -89,6 +90,12 @@ export class <%= entityAngularName %>Service {
     search(req?: any): Observable<HttpResponse<<%= entityAngularName %>[]>> {
         const options = createRequestOption(req);
         return this.http.get<<%= entityAngularName %>[]>(this.resourceSearchUrl, { params: options, observe: 'response' })
+            .map((res: HttpResponse<<%= entityAngularName %>[]>) => this.convertArrayResponse(res));
+
+    }
+    searchExample(req? : any): Observable<HttpResponse<<%= entityAngularName %>[]>> {
+            const options = createRequestOption(req);
+        return this.http.get<<%= entityAngularName %>[]>(this.resourceSearchExampleUrl, { params: options, observe: 'response' })
             .map((res: HttpResponse<<%= entityAngularName %>[]>) => this.convertArrayResponse(res));
     }
     <%_ } _%>

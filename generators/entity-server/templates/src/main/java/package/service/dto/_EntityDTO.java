@@ -81,6 +81,7 @@ public class <%= entityClass %>DTO implements Serializable {
         const relationshipFieldName = relationships[idx].relationshipFieldName;
         const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
         const relationshipType = relationships[idx].relationshipType;
+        const otherEntityName = relationships[idx].otherEntityName;
         const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
         const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
         const ownerSide = relationships[idx].ownerSide; _%>
@@ -90,6 +91,9 @@ public class <%= entityClass %>DTO implements Serializable {
     <%_ } else if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
 
     private Long <%= relationshipFieldName %>Id;
+
+    private <%=otherEntityNameCapitalized%>DTO  <%=otherEntityName%>DTO;
+
     <%_ if (otherEntityFieldCapitalized !== 'Id' && otherEntityFieldCapitalized !== '') { _%>
 
     private String <%= relationshipFieldName %><%= otherEntityFieldCapitalized %>;
@@ -158,14 +162,22 @@ public class <%= entityClass %>DTO implements Serializable {
     <%_ } else if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
 
     <%_ if (relationshipNameCapitalized.length > 1) { _%>
+    public <%= otherEntityNameCapitalized %>DTO get<%= otherEntityNameCapitalized %>DTO() {
+        return this.<%= otherEntityName %>DTO;
+    }
+
+    public void set<%= otherEntityNameCapitalized %>DTO(<%= otherEntityNameCapitalized %>DTO <%= otherEntityName %>DTO ) {
+        this.<%= otherEntityName %>DTO = <%= otherEntityName %>DTO;
+    }
     public Long get<%= relationshipNameCapitalized %>Id() {
         return <%= relationshipFieldName %>Id;
-    }
+        }
 
     public void set<%= relationshipNameCapitalized %>Id(Long <%= otherEntityName %>Id) {
         this.<%= relationshipFieldName %>Id = <%= otherEntityName %>Id;
-    }
-    <%_ } else { // special case when the entity name has one character _%>
+        }
+
+<%_ } else { // special case when the entity name has one character _%>
     public Long get<%= relationshipNameCapitalized.toLowerCase() %>Id() {
         return <%= relationshipFieldName %>Id;
     }

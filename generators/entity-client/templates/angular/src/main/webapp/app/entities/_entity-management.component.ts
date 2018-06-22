@@ -16,10 +16,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy,ViewChild } from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
 import { ActivatedRoute, Router } from '@angular/router';
+import {NgForm} from '@angular/forms';
 <%_ } else if (searchEngine === 'elasticsearch') { _%>
 import { ActivatedRoute } from '@angular/router';
 <%_ } _%>
@@ -27,9 +28,28 @@ import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, <% if (pagination !== 'no') { %>JhiParseLinks, <% } %>JhiAlertService<% if (fieldsContainBlob) { %>, JhiDataUtils<% } %> } from 'ng-jhipster';
 
 import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
+import { <%= entityAngularName %>PopupService } from './<%= entityFileName %>-popup.service';
 import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
+import { <%= entityAngularName %>DeleteDialogComponent } from './<%= entityFileName %>-delete-dialog.component';
 import { <% if (pagination !== 'no') { %>ITEMS_PER_PAGE, <% } %>Principal } from '../../shared';
+import {<%= entityAngularName %>Search} from './<%= entityFileName %>.search.model';
+<%_ for (idx in relationships) {
+    const relationshipType = relationships[idx].relationshipType;
+    const ownerSide = relationships[idx].ownerSide;
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const relationshipName = relationships[idx].relationshipName;
+    const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const otherEntityField = relationships[idx].otherEntityField;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const relationshipRequired = relationships[idx].relationshipRequired; _%>
 
+import {<%=otherEntityNameCapitalized %>} from '../<%=otherEntityName %>/<%=otherEntityName %>.model';
+import {<%=otherEntityNameCapitalized %>Service} from "../<%=otherEntityName %>/<%=otherEntityName %>.service";
+<%_ } _%>
 @Component({
     selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>',
     templateUrl: './<%= entityFileName %>.component.html'
@@ -37,6 +57,7 @@ import { <% if (pagination !== 'no') { %>ITEMS_PER_PAGE, <% } %>Principal } from
 export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
     <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
 <%- include('pagination-template', {toArrayString: toArrayString}); -%>
+
     <%_ } else if (pagination === 'infinite-scroll') { _%>
 <%- include('infinite-scroll-template', {toArrayString: toArrayString}); -%>
     <%_ } else if (pagination === 'no') { _%>
@@ -48,6 +69,26 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.registerChangeIn<%= entityClassPlural %>();
+        <%_ for (idx in relationships) {
+            const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired; _%>
+        this.<%= otherEntityName %>Service.query().subscribe(
+            (res: HttpResponse<<%=otherEntityNameCapitalized%>[]>) => this.<%= otherEntityNamePlural %> = res.body,
+            (res: HttpErrorResponse) => this.onError(res.message)
+        );
+
+            <%_ } _%>
+
     }
 
     ngOnDestroy() {
@@ -109,5 +150,10 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
     <%_ }} _%>
     private onError(error) {
         this.jhiAlertService.error(error.message, null, null);
+    }
+
+    public deleteItem(id:number){
+        this.<%= entityInstance%>PopupService
+            .open(<%= entityAngularName %>DeleteDialogComponent as Component, id);
     }
 }

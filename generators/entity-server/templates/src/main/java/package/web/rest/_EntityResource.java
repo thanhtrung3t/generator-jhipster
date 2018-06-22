@@ -31,6 +31,7 @@ import <%=packageName%>.web.rest.util.HeaderUtil;<% if (pagination !== 'no') { %
 import <%=packageName%>.web.rest.util.PaginationUtil;<% } %>
 <%_ if (dto === 'mapstruct') { _%>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
+import <%=packageName%>.service.dto.<%= entityClass %>SearchDTO;
 <%_ if (service === 'no') { _%>
 import <%=packageName%>.service.mapper.<%= entityClass %>Mapper;
 <%_ } } _%>
@@ -165,5 +166,10 @@ public class <%= entityClass %>Resource {
      * @return the result of the search
      */
     @GetMapping("/_search/<%= entityApiUrl %>")
-    @Timed<%- include('../../common/search_template', {viaService: viaService}); -%><% } %>
+    @Timed<%- include('../../common/search_template', {viaService: viaService}); -%>
+
+
+    @GetMapping("/_search_example/<%= entityApiUrl %>")
+    @Timed<%- include('../../common/search_example_template', {viaService: viaService}); -%><% } %>
+
 }

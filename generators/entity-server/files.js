@@ -134,6 +134,10 @@ const serverFiles = {
                     renameTo: generator => `${generator.packageFolder}/service/dto/${generator.entityClass}DTO.java`
                 },
                 {
+                    file: 'package/service/dto/_EntitySearchDTO.java',
+                    renameTo: generator => `${generator.packageFolder}/service/dto/${generator.entityClass}SearchDTO.java`
+                },
+                {
                     file: 'package/service/mapper/_BaseEntityMapper.java',
                     renameTo: generator => `${generator.packageFolder}/service/mapper/EntityMapper.java`
                 },

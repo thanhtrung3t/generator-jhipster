@@ -17,9 +17,13 @@
  limitations under the License.
 -%>
 <% const keyPrefix = angularAppName + '.' + entityTranslationKey; %>
+<div class="card ">
+    <div class="card-header">
+        <span jhiTranslate="<%= keyPrefix %>.detail.title"><%= entityClassHumanized %></span> {{<%= entityInstance %>.id}}
+    </div>
+    <div class="card-body">
+
 <div *ngIf="<%= entityInstance %>">
-    <h2><span jhiTranslate="<%= keyPrefix %>.detail.title"><%= entityClassHumanized %></span> {{<%= entityInstance %>.id}}</h2>
-    <hr>
     <<%= jhiPrefixDashed %>-alert-error></<%= jhiPrefixDashed %>-alert-error>
     <dl class="row-md jh-entity-details">
         <%_ for (idx in fields) {
@@ -101,6 +105,10 @@
         <%_ } _%>
     </dl>
 
+
+</div>
+</div>
+<div class="card-footer">
     <button type="submit"
             (click)="previousState()"
             class="btn btn-info">
@@ -108,10 +116,11 @@
     </button>
 
     <button type="button"
-            [routerLink]="['/', { outlets: { popup: '<%= entityUrl %>/'+ <%= entityInstance %>.id + '/edit'} }]"
+            [routerLink]="['../../', '<%= entityUrl %>', <%= entityInstance %>.id , 'edit']"
             replaceUrl="true"
             queryParamsHandling="merge"
             class="btn btn-primary">
         <span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
     </button>
+</div>
 </div>

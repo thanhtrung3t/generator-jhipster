@@ -141,7 +141,7 @@ export class <%= entityAngularName %>Service {
         copy.<%=fields[idx].fieldName%> = this.dateUtils
             .convertLocalDateToServer(<%= entityInstance %>.<%=fields[idx].fieldName%>);
         <%_ } if (['Instant', 'ZonedDateTime'].includes(fields[idx].fieldType)) { %>
-        copy.<%=fields[idx].fieldName%> = this.dateUtils.toDate(<%= entityInstance %>.<%=fields[idx].fieldName%>);
+        copy.<%=fields[idx].fieldName%> = <%= entityInstance %>.<%= fields[idx].fieldName %> != null && <%= entityInstance %>.<%= fields[idx].fieldName %>.isValid() ? <%= entityInstance %>.<%= fields[idx].fieldName %>.toJSON() : null;
         <%_ } } _%>
         return copy;
     }

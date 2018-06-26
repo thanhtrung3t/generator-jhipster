@@ -19,6 +19,7 @@
 package <%=packageName%>.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import vn.nextlogix.exception.ApplicationException;
 <%_ if (dto !== 'mapstruct' || service === 'no') { _%>
 import <%=packageName%>.domain.<%= entityClass %>;
 <%_ } _%>

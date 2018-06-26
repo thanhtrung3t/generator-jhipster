@@ -545,6 +545,7 @@ module.exports = class extends BaseGenerator {
                     if (_.isUndefined(relationship.relationshipNameCapitalized)) {
                         relationship.relationshipNameCapitalized = _.upperFirst(relationship.relationshipName);
                     }
+                    relationship.relationshipFileName = _.kebabCase(context.relationshipNameCapitalized + _.upperFirst(context.entityAngularJSSuffix));
 
                     if (_.isUndefined(relationship.relationshipNameCapitalizedPlural)) {
                         if (relationship.relationshipName.length > 1) {

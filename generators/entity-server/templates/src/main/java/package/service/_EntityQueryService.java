@@ -48,7 +48,26 @@ import io.github.jhipster.service.QueryService;
 import <%=packageName%>.domain.<%= entityClass %>;
 import <%=packageName%>.domain.*; // for static metamodels
 import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEngine === 'elasticsearch') { %>
-import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;<% } %>
+import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;
+<%_ for (idx in relationships) {
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const relationshipType = relationships[idx].relationshipType;
+
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const ownerSide = relationships[idx].ownerSide; _%>
+
+<%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+    import <%=packageName%>.repository.search.<%= otherEntityNameCapitalized %>SearchRepository;
+<%_ if (dto === 'mapstruct'){ _%>
+    import <%=packageName%>.service.mapper.<%= otherEntityNameCapitalized %>Mapper;
+<%_ } _%>
+<%_ } _%>
+<%_ } _%>
+<% } %>
 import <%=packageName%>.service.dto.<%= entityClass %>Criteria;
 <% if (dto === 'mapstruct') { %>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;

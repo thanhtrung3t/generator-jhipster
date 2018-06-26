@@ -92,7 +92,7 @@ public class <%= entityClass %>DTO implements Serializable {
 
     private Long <%= relationshipFieldName %>Id;
 
-    private <%=otherEntityNameCapitalized%>DTO  <%=otherEntityName%>DTO;
+    private <%=otherEntityNameCapitalized%>DTO  <%=relationshipFieldName%>DTO;
 
     <%_ if (otherEntityFieldCapitalized !== 'Id' && otherEntityFieldCapitalized !== '') { _%>
 
@@ -141,6 +141,7 @@ public class <%= entityClass %>DTO implements Serializable {
     <%_ } _%>
     <%_ for (idx in relationships) {
         relationshipFieldName = relationships[idx].relationshipFieldName,
+
         relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural,
         otherEntityName = relationships[idx].otherEntityName,
         otherEntityNamePlural = relationships[idx].otherEntityNamePlural,
@@ -162,12 +163,12 @@ public class <%= entityClass %>DTO implements Serializable {
     <%_ } else if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
 
     <%_ if (relationshipNameCapitalized.length > 1) { _%>
-    public <%= otherEntityNameCapitalized %>DTO get<%= otherEntityNameCapitalized %>DTO() {
-        return this.<%= otherEntityName %>DTO;
+    public <%= otherEntityNameCapitalized %>DTO get<%= relationshipNameCapitalized %>DTO() {
+        return this.<%= relationshipFieldName %>DTO;
     }
 
-    public void set<%= otherEntityNameCapitalized %>DTO(<%= otherEntityNameCapitalized %>DTO <%= otherEntityName %>DTO ) {
-        this.<%= otherEntityName %>DTO = <%= otherEntityName %>DTO;
+    public void set<%= relationshipNameCapitalized %>DTO(<%= otherEntityNameCapitalized %>DTO <%= relationshipFieldName %>DTO ) {
+        this.<%= relationshipFieldName %>DTO = <%= relationshipFieldName %>DTO;
     }
     public Long get<%= relationshipNameCapitalized %>Id() {
         return <%= relationshipFieldName %>Id;

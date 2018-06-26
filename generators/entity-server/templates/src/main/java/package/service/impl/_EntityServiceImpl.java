@@ -30,7 +30,13 @@ package <%=packageName%>.service<% if (service === 'serviceImpl') { %>.impl<% } 
     if (service === 'serviceImpl') { %>
 import <%=packageName%>.service.<%= entityClass %>Service;<% } %>
 import <%=packageName%>.domain.<%= entityClass %>;
-import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEngine === 'elasticsearch') { %>
+
+
+    import <%=packageName%>.repository.<%= entityClass %>Repository;<% if (searchEngine === 'elasticsearch') { %>
+    import org.elasticsearch.search.sort.SortBuilders;
+    import org.elasticsearch.search.sort.SortOrder;
+
+    import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import <%=packageName%>.repository.search.<%= entityClass %>SearchRepository;<% } if (dto === 'mapstruct') { %>
 import <%=packageName%>.service.dto.<%= entityClass %>DTO;
 import <%=packageName%>.service.dto.<%= entityClass %>SearchDTO;
@@ -216,11 +222,32 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
                 const fieldName = fields[idx].fieldName; _%>
             <%_ if(fieldType === 'String') { _%>
             if(StringUtils.isNotBlank(searchDto.get<%=fieldInJavaBeanMethod%>())) {
-            boolQueryBuilder.must(QueryBuilders.wildcardQuery("<%=fieldName%>", "*"+searchDto.get<%=fieldInJavaBeanMethod%>()+"*"));
+                 boolQueryBuilder.must(QueryBuilders.wildcardQuery("<%=fieldName%>", "*"+searchDto.get<%=fieldInJavaBeanMethod%>()+"*"));
             }
             <%_ } _%>
             <%_ } _%>
-            SearchQuery  query = nativeSearchQueryBuilder.withQuery(boolQueryBuilder).withPageable(pageable).build();
+            <%_ for (idx in relationships) {
+                const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+                const relationshipFieldName = relationships[idx].relationshipFieldName;
+                const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                const relationshipType = relationships[idx].relationshipType;
+                const relationshipNameCapitalized = relationships[idx].relationshipNameCapitalized;
+                const otherEntityName = relationships[idx].otherEntityName;
+                const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                const ownerSide = relationships[idx].ownerSide; _%>
+            <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
+            if(searchDto.get<%=relationshipNameCapitalized%>Id() !=null) {
+                boolQueryBuilder.must(QueryBuilders.matchQuery("<%=relationshipFieldName%>.Id", searchDto.get<%=relationshipNameCapitalized%>Id()));
+            }
+            <%_ } _%>
+            <%_ } _%>
+            NativeSearchQueryBuilder queryBuilder = nativeSearchQueryBuilder.withQuery(boolQueryBuilder).withPageable(pageable);
+
+            pageable.getSort().forEach(sort -> {
+            queryBuilder.withSort(SortBuilders.fieldSort(sort.getProperty()).order(sort.getDirection() ==org.springframework.data.domain.Sort.Direction.ASC?SortOrder.ASC:SortOrder.DESC).unmappedType("long"));
+            });
+            NativeSearchQuery query = queryBuilder.build();
             Page<<%= entityClass %>> <%= entityInstance %>Page= <%= entityInstance %>SearchRepository.search(query);
             List<<%= instanceType %>> <%= entityInstance %>List =  StreamSupport
             .stream(<%= entityInstance %>Page.spliterator(), false)
@@ -232,18 +259,18 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
                 const relationshipFieldName = relationships[idx].relationshipFieldName;
                 const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
                 const relationshipType = relationships[idx].relationshipType;
-
+                const relationshipNameCapitalized = relationships[idx].relationshipNameCapitalized;
                 const otherEntityName = relationships[idx].otherEntityName;
                 const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
                 const ownerSide = relationships[idx].ownerSide; _%>
             <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
-            if(<%= entityInstance %>Dto.get<%= otherEntityNameCapitalized %>Id()!=null) {
-                <%=otherEntityNameCapitalized %> <%=otherEntityName %>= <%=otherEntityName %>SearchRepository.findOne(<%= entityInstance %>Dto.get<%=otherEntityNameCapitalized %>Id());
-                <%= entityInstance %>Dto.set<%=otherEntityNameCapitalized %>DTO(<%=otherEntityName %>Mapper.toDto(<%=otherEntityName %>));
-            <%_ } _%>
-            <%_ } _%>
+            if(<%= entityInstance %>Dto.get<%= relationshipNameCapitalized %>Id()!=null){
+                <%=otherEntityNameCapitalized%> <%=otherEntityName%>= <%=otherEntityName%>SearchRepository.findOne(<%=entityInstance%>Dto.get<%=relationshipNameCapitalized%>Id());
+                <%=entityInstance%>Dto.set<%=relationshipNameCapitalized%>DTO(<%=otherEntityName%>Mapper.toDto(<%=otherEntityName%>));
             }
+            <%_ } _%>
+            <%_ } _%>
             });
             return new PageImpl<>(<%= entityInstance %>List,pageable,<%= entityInstance %>Page.getTotalElements());
         }

@@ -45,6 +45,7 @@ import {<%= entityAngularName %>Search} from './<%= entityFileName %>.search.mod
     const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
     const otherEntityField = relationships[idx].otherEntityField;
     const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const relationshipFileName = relationships[idx].relationshipFileName;
     const relationshipRequired = relationships[idx].relationshipRequired; _%>
 
 import {<%=otherEntityNameCapitalized %>} from '../<%=otherEntityName %>/<%=otherEntityName %>.model';

@@ -26,7 +26,7 @@
     public List<<%= instanceType %>> searchExample<%= entityClassPlural %>(@RequestParam String query) {
         log.debug("REST request to search <%= entityClassPlural %> for query {}", query);<%- include('search_stream_template', {viaService: viaService}); -%>
     <% } if (pagination !== 'no') { %>
-    public ResponseEntity<List<<%= instanceType %>>> searchExample<%= entityClassPlural %>(<%= entityClass%>SearchDTO searchDTO , Pageable pageable) {
+    public ResponseEntity<List<<%= instanceType %>>> searchExample<%= entityClassPlural %>(<%= entityClass%>SearchDTO searchDTO , Pageable pageable) throws ApplicationException {
         log.debug("REST request to search example for a page of <%= entityClassPlural %> for searchDTO {}", searchDTO);<% if (viaService) { %>
         Page<<%= instanceType %>> page = <%= entityInstance %>Service.searchExample(searchDTO, pageable);<% } else { %>
         Page<<%= entityClass %>> page = <%= entityInstance %>SearchRepository.search(queryStringQuery(query), pageable);<% } %>

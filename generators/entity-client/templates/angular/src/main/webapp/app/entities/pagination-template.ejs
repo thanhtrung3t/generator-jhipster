@@ -43,7 +43,7 @@ currentAccount: any;
     predicate: any;
     previousPage: any;
     reverse: any;
-    <%= entityFileName %>Search : <%= entityAngularName %>Search;
+    <%= entityInstance %>Search : <%= entityAngularName %>Search;
     <%_ for (idx in relationships) {
         const relationshipType = relationships[idx].relationshipType;
         const ownerSide = relationships[idx].ownerSide;
@@ -114,14 +114,31 @@ currentAccount: any;
                 const otherEntityField = relationships[idx].otherEntityField;
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
                 const relationshipRequired = relationships[idx].relationshipRequired; _%>
-         this.<%= otherEntityNamePlural %> =[];
+        this.<%= otherEntityNamePlural %> =[];
        <%_ } _%>
 
-        this.<%= entityFileName %>Search = new <%= entityAngularName %>Search();
+        this.<%= entityInstance %>Search = new <%= entityAngularName %>Search();
 
         <%_ if (searchEngine === 'elasticsearch') { _%>
-        this.currentSearch = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['search'] ?
-            this.activatedRoute.snapshot.params['search'] : '';
+         <%_ for (idx in fields) {
+             const fieldName = fields[idx].fieldName;
+             const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+          _%>
+        this.<%= entityInstance %>Search.<%=fieldName%> = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= fieldName %>'] ?
+                        this.activatedRoute.snapshot.params[' <%= fieldName %>'] : '';
+         <%_ } _%>
+         <%_ for (idx in relationships) {
+                       const relationshipType = relationships[idx].relationshipType;
+                       const ownerSide = relationships[idx].ownerSide;
+                       const otherEntityName = relationships[idx].otherEntityName;
+                       const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                       const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                       const relationshipFieldName = relationships[idx].relationshipFieldName;
+                       const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                   _%>
+        this.<%= entityInstance %>Search.<%=relationshipFieldName%>Id = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] ?
+                         this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] : '';
+         <%_ } _%>
         <%_ } _%>
         <%_ } _%>
     }
@@ -136,7 +153,7 @@ currentAccount: any;
              const fieldName = fields[idx].fieldName;
              const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
           _%>
-         <%= fieldName %> : this.<%= entityFileName %>Search.<%= fieldName %>,
+         <%= fieldName %> : this.<%= entityInstance %>Search.<%= fieldName %>,
           <%_ } _%>
           <%_ for (idx in relationships) {
               const relationshipType = relationships[idx].relationshipType;
@@ -147,15 +164,20 @@ currentAccount: any;
               const relationshipFieldName = relationships[idx].relationshipFieldName;
               const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
           _%>
-           <%= relationshipFieldName %>Id : this.<%= entityFileName %>Search.<%= relationshipFieldName %>Id,
+           <%= relationshipFieldName %>Id : this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,
             <%_ } _%>
          };
 
-        this.<%= entityFileName %>Service.searchExample(obj).subscribe(
-          (res: HttpResponse<District[]>) => this.onSuccess(res.body, res.headers),
+        this.<%= entityInstance %>Service.searchExample(obj).subscribe(
+          (res: HttpResponse<<%= entityAngularName %>[]>) => this.onSuccess(res.body, res.headers),
           (res: HttpErrorResponse) => this.onError(res.message)
         );
         <%_ } _%>
+
+    }
+    searchInForm(){
+          this.page = 0;
+          this.transition();
 
     }
     <%_ if (databaseType !== 'cassandra') { _%>
@@ -166,7 +188,7 @@ currentAccount: any;
         }
     }
     transition() {
-        this.router.navigate(['/<%= entityUrl %>'], {queryParams:
+        this.router.navigate(['/setup/<%= entityUrl %>'], {queryParams:
             {
                 page: this.page,
                 size: this.itemsPerPage,
@@ -176,7 +198,7 @@ currentAccount: any;
                  const fieldName = fields[idx].fieldName;
                  const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
               _%>
-                <%= fieldName %> : this.<%= entityFileName %>Search.<%= fieldName %>,
+                <%= fieldName %> : this.<%= entityInstance %>Search.<%= fieldName %>,
               <%_ } _%>
               <%_ for (idx in relationships) {
                   const relationshipType = relationships[idx].relationshipType;
@@ -187,7 +209,7 @@ currentAccount: any;
                   const relationshipFieldName = relationships[idx].relationshipFieldName;
                   const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
               _%>
-                <%= relationshipFieldName %>Id : this.<%= entityFileName %>Search.<%= relationshipFieldName %>Id,
+                <%= relationshipFieldName %>Id : this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,
               <%_ } _%>
                 <%_ } _%>
                 sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
@@ -201,7 +223,7 @@ currentAccount: any;
         <%_ if(searchEngine === 'elasticsearch') { _%>
         this.currentSearch = '';
         <%_ } _%>
-        this.router.navigate(['/<%= entityUrl %>', {
+        this.router.navigate(['/setup/<%= entityUrl %>', {
             page: this.page,
             sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
         }]);
@@ -215,7 +237,7 @@ currentAccount: any;
         }
         this.page = 0;
         this.currentSearch = query;
-        this.router.navigate(['/<%= entityUrl %>', {
+        this.router.navigate(['/setup/<%= entityUrl %>', {
             search: this.currentSearch,
             page: this.page,
             sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')

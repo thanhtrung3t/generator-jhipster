@@ -450,6 +450,7 @@ module.exports = class extends BaseGenerator {
                 context.fieldsContainManyToOne = false;
                 context.hasMasterRelationship = false;
                 context.hasDetailRelationship = false;
+                context.hasRelationshipWithCompany = false;
                 context.differentTypes = [context.entityClass];
                 if (!context.relationships) {
                     context.relationships = [];

@@ -754,6 +754,59 @@ module.exports = class extends Generator {
         };
     }
 
+    generateEntityQueriesInMasterDetail(relationships, entityInstance, dto) {
+        const queries = [];
+        const variables = [];
+        let hasManyToMany = false;
+        relationships.forEach((relationship) => {
+            let query;
+            let variableName;
+            hasManyToMany = hasManyToMany || relationship.relationshipType === 'many-to-many';
+            if (relationship.relationshipType === 'one-to-one' && relationship.ownerSide === true && relationship.otherEntityName !== 'user') {
+                variableName = relationship.relationshipFieldNamePlural.toLowerCase();
+                if (variableName === entityInstance) {
+                    variableName += 'Collection';
+                }
+                const relationshipFieldName = `this.${entityInstance}.${relationship.relationshipFieldName}`;
+                const relationshipFieldNameIdCheck = dto === 'no' ?
+                    `!${relationshipFieldName} || !${relationshipFieldName}.id` :
+                    `!${relationshipFieldName}Id`;
+
+                query =
+                    `this.${relationship.otherEntityName}Service
+            .query({filter: '${relationship.otherEntityRelationshipName.toLowerCase()}-is-null'})
+            .subscribe((res: HttpResponse<${relationship.otherEntityAngularName}[]>) => {
+                if (${relationshipFieldNameIdCheck}) {
+                    this.${variableName} = res.body;
+                } else {
+                    this.${relationship.otherEntityName}Service
+                        .find(${relationshipFieldName}${dto === 'no' ? '.id' : 'Id'})
+                        .subscribe((subRes: HttpResponse<${relationship.otherEntityAngularName}>) => {
+                            this.${variableName} = [subRes.body].concat(res.body);
+                        }, (subRes: HttpErrorResponse) => this.onError(subRes.message));
+                }
+            }, (res: HttpErrorResponse) => this.onError(res.message));`;
+            } else if (relationship.relationshipType !== 'one-to-many' && !(relationship.relationshipType === 'many-to-one' && relationship.relationshipName.endsWith('Parent'))) {
+                variableName = relationship.otherEntityNameCapitalizedPlural.toLowerCase();
+                if (variableName === entityInstance) {
+                    variableName += 'Collection';
+                }
+                query =
+                    `this.${relationship.otherEntityName}Service.query()
+            .subscribe((res: HttpResponse<${relationship.otherEntityAngularName}[]>) => { this.${variableName} = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));`;
+            }
+            if (variableName && !this.contains(queries, query)) {
+                queries.push(query);
+                variables.push(`${variableName}: ${relationship.otherEntityAngularName}[];`);
+            }
+        });
+        return {
+            queries,
+            variables,
+            hasManyToMany
+        };
+    }
+
     /**
      * Get DB type from DB value
      * @param {string} db - db

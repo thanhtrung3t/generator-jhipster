@@ -24,6 +24,25 @@ import { <%= angularXAppName %>SharedModule } from '../../shared';
     if (key === 'User') { _%>
         import { <%= angularXAppName %>AdminModule } from '../../admin/admin.module';
         <%_ }}); _%>
+<%_
+for (idx in relationships) {
+    const relationshipType = relationships[idx].relationshipType;
+    const ownerSide = relationships[idx].ownerSide;
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const relationshipName = relationships[idx].relationshipName;
+    const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const otherEntityAngularFileName = relationships[idx].otherEntityAngularFileName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const otherEntityField = relationships[idx].otherEntityField;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const relationshipRequired = relationships[idx].relationshipRequired;
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    if(relationshipType === 'one-to-many'  && relationshipName.endsWith('DetailList') && otherEntityRelationshipName.endsWith('Parent')){ _%>
+    import <%= angularXAppName %><%=otherEntityNameCapitalized%>DetailModule from '../<%=otherEntityAngularFileName%>-detail';
+    <%_ }} _%>
 import {
 <%= entityAngularName %>Component,
     <%= entityAngularName %>DetailComponent,
@@ -47,6 +66,24 @@ const ENTITY_STATES = [
             if (key === 'User') { _%>
             <%= angularXAppName %>AdminModule,
             <%_ }}); _%>
+<%_
+for (idx in relationships) {
+    const relationshipType = relationships[idx].relationshipType;
+    const ownerSide = relationships[idx].ownerSide;
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const relationshipName = relationships[idx].relationshipName;
+    const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const otherEntityField = relationships[idx].otherEntityField;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const relationshipRequired = relationships[idx].relationshipRequired;
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    if(relationshipType === 'one-to-many'  && relationshipName.endsWith('DetailList') && otherEntityRelationshipName.endsWith('Parent')){_%>
+    <%= angularXAppName %><%=otherEntityNameCapitalized%>DetailModule,
+        <%_ }} _%>
 RouterModule.forChild(ENTITY_STATES)
 ],
 declarations: [

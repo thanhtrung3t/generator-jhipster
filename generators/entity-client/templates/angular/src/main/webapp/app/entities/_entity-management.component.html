@@ -73,6 +73,7 @@ limitations under the License.
             fieldInputType = 'hidden';
             }
             _%>
+            <%_ if (!['byte[]', 'ByteBuffer'].includes(fieldType)) {_%>
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="field_<%= fieldName %>"
                        jhiTranslate="<%= keyPrefix %>.<%= fieldName %>"><%= fieldNameHumanized %>:</label>
@@ -87,30 +88,7 @@ limitations under the License.
                         <%_ } _%>
                     </select>
                     <%_ } else { _%>
-                    <%_ if (['byte[]', 'ByteBuffer'].includes(fieldType) && fieldTypeBlobContent !== 'text') { _%>
-                    <div>
-                        <%_ if (fieldTypeBlobContent === 'image') { _%>
-                        <img [src]="'data:' + <%=entityInstance %>.<%=fieldName%>ContentType + ';base64,' + <%=entityInstance %>.<%=fieldName%>" style="max-height: 100px;" *ngIf="<%= entityInstance %>.<%= fieldName %>" alt="<%=entityInstance %> image"/>
-                        <%_ } _%>
-                        <div *ngIf="<%= entityInstance %>.<%= fieldName %>" class="form-text text-danger clearfix">
-                            <%_ if (fieldTypeBlobContent === 'any') { _%>
-                            <a class="pull-left" (click)="openFile(<%= entityInstance %>.<%= fieldName %>ContentType, <%= entityInstance %>.<%= fieldName %>)" jhiTranslate="entity.action.open">open</a><br>
-                            <span class="pull-left">{{<%= entityInstance %>.<%= fieldName %>ContentType}}, {{byteSize(<%= entityInstance %>.<%= fieldName %>)}}</span>
-                            <%_ } else { _%>
-                            <span class="pull-left">{{<%= entityInstance %>.<%= fieldName %>ContentType}}, {{byteSize(<%= entityInstance %>.<%= fieldName %>)}}</span>
-                            <%_ } _%>
-                            <%_ if (fieldTypeBlobContent === 'image') { _%>
-                            <button type="button" (click)="clearInputImage('<%= fieldName %>', '<%= fieldName %>ContentType', 'fileImage')" class="btn btn-secondary btn-xs pull-right">
-                                <%_ } else { _%>
-                                <button type="button" (click)="<%= entityInstance %>.<%= fieldName %>=null;<%= entityInstance %>.<%= fieldName %>ContentType=null;"
-                                        class="btn btn-secondary btn-xs pull-right">
-                                    <%_ } _%>
-                                    <fa-icon [icon]="'times'"></fa-icon>
-                                </button>
-                        </div>
-                        <input type="file" id="file_<%= fieldName %>" (change)="setFileData($event, <%= entityInstance %>, '<%= fieldName %>', <% if (fieldTypeBlobContent === 'image') { %>true)" accept="image/*" jhiTranslate="entity.action.addimage"<% } else { %>false)" jhiTranslate="entity.action.addblob"<% } %>/>
-                    </div>
-                    <%_ } _%>
+
                     <%_ if (fieldType === 'LocalDate') { _%>
                     <div class="input-group">
                         <input id="field_<%= fieldName %>" type="text" class="form-control" name="<%= fieldName %>" ngbDatepicker  #<%= fieldName %>Dp="ngbDatepicker" [(ngModel)]="<%= entityInstance %>Search.<%= fieldName %>"
@@ -138,6 +116,7 @@ limitations under the License.
                     <%_ } _%>
                 </div>
             </div>
+            <%_ } _%>
             <%_ } _%>
 
             <%_ for (idx in relationships) {

@@ -97,6 +97,7 @@ const angularjsFiles = {
                 renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}.search.service.js`
             }]
         }
+
     ],
     test: [
         {
@@ -191,6 +192,48 @@ const angularFiles = {
                     renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}-popup.service.ts`
                 }
 
+            ]
+        },
+        {
+            condition: generator => generator.hasMasterRelationship ,
+            path: ANGULAR_DIR,
+            templates: [{
+                file: 'entities/master-detail/_entity-management-detail.module.ts',
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail.module.ts`
+            },{
+                file: 'entities/master-detail/_entity-management-detail-list.component.ts',
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.ts`
+            },{
+                file: 'entities/master-detail/_entity-management-detail-list.component.html',
+                method: 'processHtml',
+                template: true,
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.html`
+            },{
+                file: 'entities/master-detail/_entity-management-detail-update.component.html',
+                method: 'processHtml',
+                template: true,
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.html`
+            },{
+                file: 'entities/master-detail/_entity-management-detail-update.component.ts',
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.ts`
+            },{
+                file: 'entities/master-detail/_entity-management-detail-delete-dialog.component.ts',
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.ts`
+            },
+            {
+                file: 'entities/master-detail/_entity-management-detail-delete-dialog.component.html',
+                method: 'processHtml',
+                template: true,
+                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.html`
+            },
+            {
+                    file: 'entities/master-detail/_entity-detail-popup.service.ts',
+                    renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-popup.service.ts`
+                },
+            {
+                    file: 'entities/master-detail/_index.ts',
+                    renameTo: generator => `entities/${generator.entityFolderName}-detail/index.ts`
+                }
             ]
         }
     ],

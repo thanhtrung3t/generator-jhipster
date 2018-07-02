@@ -33,24 +33,15 @@ import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service
 import { <%= entityAngularName %>DeleteDialogComponent } from './<%= entityFileName %>-delete-dialog.component';
 import { <% if (pagination !== 'no') { %>ITEMS_PER_PAGE, <% } %>Principal } from '../../shared';
 import {<%= entityAngularName %>Search} from './<%= entityFileName %>.search.model';
-<%_ for (idx in relationships) {
-    const relationshipType = relationships[idx].relationshipType;
-    const ownerSide = relationships[idx].ownerSide;
-    const otherEntityName = relationships[idx].otherEntityName;
-    const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
-    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
-    const relationshipName = relationships[idx].relationshipName;
-    const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
-    const relationshipFieldName = relationships[idx].relationshipFieldName;
-    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
-    const otherEntityField = relationships[idx].otherEntityField;
-    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-    const relationshipFileName = relationships[idx].relationshipFileName;
-    const relationshipRequired = relationships[idx].relationshipRequired; _%>
+<%_
+let hasRelationshipQuery = false;
+Object.keys(differentRelationships).forEach(key => {
+    const uniqueRel = differentRelationships[key][0];
+    _%>
+    import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
+<%_}); _%>
 
-import {<%=otherEntityNameCapitalized %>} from '../<%=otherEntityName %>/<%=otherEntityName %>.model';
-import {<%=otherEntityNameCapitalized %>Service} from "../<%=otherEntityName %>/<%=otherEntityName %>.service";
-<%_ } _%>
+
 @Component({
     selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>',
     templateUrl: './<%= entityFileName %>.component.html'
@@ -82,14 +73,14 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
             const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
             const otherEntityField = relationships[idx].otherEntityField;
             const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-            const relationshipRequired = relationships[idx].relationshipRequired; _%>
+            const relationshipRequired = relationships[idx].relationshipRequired;
+                if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
+            _%>
         this.<%= otherEntityName %>Service.query().subscribe(
             (res: HttpResponse<<%=otherEntityNameCapitalized%>[]>) => this.<%= otherEntityNamePlural %> = res.body,
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-
-            <%_ } _%>
-
+        <%_} } _%>
     }
 
     ngOnDestroy() {

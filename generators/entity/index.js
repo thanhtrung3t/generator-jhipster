@@ -448,6 +448,8 @@ module.exports = class extends BaseGenerator {
                 context.fieldsContainOwnerOneToOne = false;
                 context.fieldsContainOneToMany = false;
                 context.fieldsContainManyToOne = false;
+                context.hasMasterRelationship = false;
+                context.hasDetailRelationship = false;
                 context.differentTypes = [context.entityClass];
                 if (!context.relationships) {
                     context.relationships = [];
@@ -545,7 +547,7 @@ module.exports = class extends BaseGenerator {
                     if (_.isUndefined(relationship.relationshipNameCapitalized)) {
                         relationship.relationshipNameCapitalized = _.upperFirst(relationship.relationshipName);
                     }
-                    relationship.relationshipFileName = _.kebabCase(context.relationshipNameCapitalized + _.upperFirst(context.entityAngularJSSuffix));
+
 
                     if (_.isUndefined(relationship.relationshipNameCapitalizedPlural)) {
                         if (relationship.relationshipName.length > 1) {
@@ -570,6 +572,13 @@ module.exports = class extends BaseGenerator {
                     if (_.isUndefined(relationship.relationshipFieldNamePlural)) {
                         relationship.relationshipFieldNamePlural = pluralize(_.lowerFirst(relationship.relationshipName));
                     }
+                    if (relationship.relationshipType === 'one-to-many' && relationship.relationshipName.endsWith('DetailList')){
+                        context.hasDetailRelationship = true;
+                    }
+
+                    if (relationship.relationshipType === 'many-to-one' && relationship.relationshipName.endsWith('Parent')){
+                        context.hasMasterRelationship = true;
+                    }
 
                     if (_.isUndefined(relationship.otherEntityRelationshipNamePlural) && (relationship.relationshipType === 'one-to-many' ||
                         (relationship.relationshipType === 'many-to-many' && relationship.ownerSide === false) ||
@@ -586,6 +595,7 @@ module.exports = class extends BaseGenerator {
                     }
 
                     const otherEntityName = relationship.otherEntityName;
+                    relationship.otherEntityAngularFileName = _.kebabCase(_.upperFirst(relationship.otherEntityName) + _.upperFirst(context.entityAngularJSSuffix));
                     const otherEntityData = this.getEntityJson(otherEntityName);
                     const jhiTablePrefix = context.jhiTablePrefix;
 

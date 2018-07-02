@@ -1,7 +1,7 @@
 <%#
  Copyright 2013-2018 the original author or authors from the JHipster project.
 
- This file is part of the JHipster project, see https://www.jhipster.tech/
+ This file is part of the JHipster project, see http://www.jhipster.tech/
  for more information.
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,55 +17,59 @@
  limitations under the License.
 -%>
 <%_
-const query = generateEntityQueries(relationships, entityInstance, dto);
+const i18nToLoad = [entityInstance];
+for (const idx in fields) {
+    if (fields[idx].fieldIsEnum === true) {
+        i18nToLoad.push(fields[idx].enumInstance);
+    }
+}
+const query = generateEntityQueriesInMasterDetail(relationships, entityInstance, dto);
 const queries = query.queries;
 const variables = query.variables;
 let hasManyToMany = query.hasManyToMany;
 _%>
-import { Component, OnInit<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
+import { Component, OnInit, OnDestroy<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+
+import { Observable } from 'rxjs/Observable';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { JhiEventManager<% if (queries && queries.length > 0) { %>, JhiAlertService<% } %><% if (fieldsContainBlob) { %>, JhiDataUtils<% } %> } from 'ng-jhipster';
 <%_ if ( fieldsContainInstant || fieldsContainZonedDateTime ) { _%>
-import * as moment from 'moment';
-import { DATE_TIME_FORMAT } from '../../shared/constants/input.constants';
-<%_ } _%>
-<%_ if (queries && queries.length > 0 || fieldsContainBlob) { _%>
-import { <% if (queries && queries.length > 0) { %>JhiAlertService, <% } %><% if (fieldsContainBlob) { %>JhiDataUtils<% } %> } from 'ng-jhipster';
-<%_ } _%>
-
-import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
-
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
+    import * as moment from 'moment';
+    import { DATE_TIME_FORMAT } from '../../shared/constants/input.constants';
+    <%_ } _%>
+import { <%= entityAngularName %> } from '../<%= entityFileName %>/<%= entityFileName %>.model';
+import { <%= entityAngularName %>Service } from '../<%= entityFileName %>/<%= entityFileName %>.service';
 <%_
 let hasRelationshipQuery = false;
 Object.keys(differentRelationships).forEach(key => {
     const hasAnyRelationshipQuery = differentRelationships[key].some(rel =>
         (rel.relationshipType === 'one-to-one' && rel.ownerSide === true && rel.otherEntityName !== 'user')
-        || rel.relationshipType !== 'one-to-many'
+            || rel.relationshipType !== 'one-to-many'
     );
     if (hasAnyRelationshipQuery) {
         hasRelationshipQuery = true;
     }
-    if (differentRelationships[key].some(rel => rel.relationshipType !== 'one-to-many')) {
+    if (differentRelationships[key].some(rel => (rel.relationshipType !== 'one-to-many') &&!(rel.relationshipType === 'many-to-one' && rel.relationshipName.endsWith('Parent')))) {
         const uniqueRel = differentRelationships[key][0];
         if (uniqueRel.otherEntityAngularName !== entityAngularName) {
-            _%>
-            import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
-            <%_     }
+_%>
+import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
+<%_     }
     }
 }); _%>
 
 @Component({
-    selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>-update',
-    templateUrl: './<%= entityFileName %>-update.component.html'
+    selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>-detail-update',
+    templateUrl: './<%= entityFileName %>-detail-update.component.html'
 })
-export class <%= entityAngularName %>UpdateComponent implements OnInit {
+export class <%= entityAngularName %>DetailUpdateComponent implements OnInit {
 
-    private _<%= entityInstance %>: <%= entityAngularName %>;
+    <%= entityInstance %>: <%= entityAngularName %>;
     isSaving: boolean;
     <%_
-    for ( const idx in variables ) { %>
+    for (const idx in variables) { %>
     <%- variables[idx] %>
     <%_ } _%>
     <%_ for ( idx in fields ) {
@@ -79,6 +83,7 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         <%_ } _%>
 
     constructor(
+        public activeModal: NgbActiveModal,
         <%_ if (fieldsContainBlob) { _%>
         private dataUtils: JhiDataUtils,
         <%_ } _%>
@@ -87,7 +92,7 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         <%_ } _%>
         private <%= entityInstance %>Service: <%= entityAngularName %>Service,
         <%_ Object.keys(differentRelationships).forEach(key => {
-            if (differentRelationships[key].some(rel => rel.relationshipType !== 'one-to-many')) {
+            if (differentRelationships[key].some(rel => (rel.relationshipType !== 'one-to-many' && !(rel.relationshipType === 'many-to-one' && rel.relationshipName.endsWith('Parent'))))) {
                 const uniqueRel = differentRelationships[key][0];
                 if (uniqueRel.otherEntityAngularName !== entityAngularName) { _%>
         private <%= uniqueRel.otherEntityName %>Service: <%= uniqueRel.otherEntityAngularName %>Service,
@@ -98,15 +103,12 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         <%_ if (fieldsContainImageBlob) { _%>
         private elementRef: ElementRef,
         <%_ } _%>
-        private route: ActivatedRoute
+        private eventManager: JhiEventManager
     ) {
     }
 
     ngOnInit() {
         this.isSaving = false;
-        this.route.data.subscribe(({<%= entityInstance %>}) => {
-            this.<%= entityInstance %> = <%= entityInstance %>;
-        });
         <%_ for (idx in queries) { _%>
         <%- queries[idx] %>
         <%_ } _%>
@@ -132,8 +134,8 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
 
     <%_ } _%>
     <%_ } _%>
-    previousState() {
-        window.history.back();
+    clear() {
+        this.activeModal.dismiss('cancel');
     }
 
     save() {
@@ -142,8 +144,8 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
             const fieldName = fields[ idx ].fieldName;
             const fieldType = fields[idx].fieldType;
             if ([ 'Instant', 'ZonedDateTime' ].includes(fieldType)) { _%>
-                this.<%= entityInstance %>.<%= fieldName %> = moment(this.<%= fieldName %>, DATE_TIME_FORMAT);
-        <%_ }
+            this.<%= entityInstance %>.<%= fieldName %> = moment(this.<%= fieldName %>, DATE_TIME_FORMAT);
+                <%_ }
         } _%>
         if (this.<%= entityInstance %>.id !== undefined) {
             this.subscribeToSaveResponse(
@@ -156,12 +158,13 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
 
     private subscribeToSaveResponse(result: Observable<HttpResponse<<%= entityAngularName %>>>) {
         result.subscribe((res: HttpResponse<<%= entityAngularName %>>) =>
-            this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+            this.onSaveSuccess(res.body), (res: HttpErrorResponse) => this.onSaveError());
     }
 
-    private onSaveSuccess() {
+    private onSaveSuccess(result: <%= entityAngularName %>) {
+        this.eventManager.broadcast({ name: '<%=entityFileName  %>-detail.save.success', content: 'OK'});
         this.isSaving = false;
-        this.previousState();
+        this.activeModal.dismiss(result);
     }
 
     private onSaveError() {
@@ -169,18 +172,18 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
     }
     <%_ if (queries && queries.length > 0) { _%>
 
-    private onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+    private onError(error: any) {
+        this.jhiAlertService.error(error.message, null, null);
     }
     <%_ } _%>
     <%_
     const entitiesSeen = [];
     for (idx in relationships) {
         const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
-        if (relationships[idx].relationshipType !== 'one-to-many' && !entitiesSeen.includes(otherEntityNameCapitalized)) {
+        if(relationships[idx].relationshipType !== 'one-to-many' && !entitiesSeen.includes(otherEntityNameCapitalized) && !(relationships[idx].relationshipType === 'many-to-one' && relationships[idx].relationshipName.endsWith('Parent'))) {
     _%>
 
-    track<%= otherEntityNameCapitalized %>ById(index: number, item: <%= relationships[idx].otherEntityAngularName %>) {
+    track<%- otherEntityNameCapitalized -%>ById(index: number, item: <%- relationships[idx].otherEntityAngularName -%>) {
         return item.id;
     }
     <%_ entitiesSeen.push(otherEntityNameCapitalized); } } _%>
@@ -197,17 +200,5 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         return option;
     }
     <%_ } _%>
-    get <%= entityInstance %>() {
-        return this._<%= entityInstance %>;
-    }
-
-    set <%= entityInstance %>(<%= entityInstance %>: <%= entityAngularName %>) {
-        this._<%= entityInstance %> = <%= entityInstance %>;
-    <%_ for (idx in fields) {
-        const fieldName = fields[idx].fieldName;
-        const fieldType = fields[idx].fieldType;
-        if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
-        this.<%= fieldName %> = moment(<%= entityInstance %>.<%= fieldName %>).format(DATE_TIME_FORMAT);
-     <%_ } } _%>
-    }
 }
+

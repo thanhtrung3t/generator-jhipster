@@ -19,6 +19,9 @@
 <%_
 const i18nKeyPrefix = angularAppName + '.'+ entityTranslationKey;
 _%>
+
+
+
 <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
 <div class="card">
     <div class="card-header">
@@ -194,6 +197,8 @@ _%>
                 const otherEntityField = relationships[idx].otherEntityField;
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
                 const relationshipRequired = relationships[idx].relationshipRequired;
+
+                const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
                 const translationKey = `${i18nKeyPrefix}.${relationshipName}`; _%>
                 <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user')) { _%>
                 <div class="form-group">
@@ -261,6 +266,26 @@ _%>
                 <%_ } _%>
             <%_ } _%>
             </div>
+    <%_
+    let parentRelationshipName ='';
+    for (idx in relationships) {
+    const relationshipType = relationships[idx].relationshipType;
+    const ownerSide = relationships[idx].ownerSide;
+    const otherEntityName = relationships[idx].otherEntityName;
+    const otherEntityAngularFileName = relationships[idx].otherEntityAngularFileName;
+    const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+    const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+    const relationshipName = relationships[idx].relationshipName;
+    const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+    const relationshipFieldName = relationships[idx].relationshipFieldName;
+    const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+    const otherEntityField = relationships[idx].otherEntityField;
+    const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+    const relationshipRequired = relationships[idx].relationshipRequired;
+    const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
+    if(relationshipType === 'one-to-many'  && relationshipName.endsWith('DetailList') && otherEntityRelationshipName.endsWith('Parent')){_%>
+            <<%= jhiPrefixDashed %>-<%= otherEntityAngularFileName %>-detail-list [<%=otherEntityRelationshipName%>Id]="<%=entityInstance %>.id" ></<%= jhiPrefixDashed %>-<%= otherEntityAngularFileName %>-detail-list>
+    <%_ }} _%>
     </div>
     <div class="card-footer">
         <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">

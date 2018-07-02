@@ -86,9 +86,9 @@ currentAccount: any;
             const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
             const otherEntityField = relationships[idx].otherEntityField;
             const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-            const relationshipRequired = relationships[idx].relationshipRequired; _%>
+            const relationshipRequired = relationships[idx].relationshipRequired;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){ _%>
         private <%= otherEntityName %>Service: <%= otherEntityNameCapitalized %>Service,
-        <%_ } _%>
+        <%_ }} _%>
 
         private <%= entityInstance %>PopupService: <%= entityAngularName %>PopupService
     ) {
@@ -113,9 +113,9 @@ currentAccount: any;
                 const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
                 const otherEntityField = relationships[idx].otherEntityField;
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-                const relationshipRequired = relationships[idx].relationshipRequired; _%>
+                const relationshipRequired = relationships[idx].relationshipRequired;   if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){_%>
         this.<%= otherEntityNamePlural %> =[];
-       <%_ } _%>
+       <%_ }} _%>
 
         this.<%= entityInstance %>Search = new <%= entityAngularName %>Search();
 
@@ -134,11 +134,11 @@ currentAccount: any;
                        const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
                        const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
                        const relationshipFieldName = relationships[idx].relationshipFieldName;
-                       const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                       const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
                    _%>
         this.<%= entityInstance %>Search.<%=relationshipFieldName%>Id = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] ?
                          this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] : '';
-         <%_ } _%>
+         <%_ }} _%>
         <%_ } _%>
         <%_ } _%>
     }
@@ -162,10 +162,10 @@ currentAccount: any;
               const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
               const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
               const relationshipFieldName = relationships[idx].relationshipFieldName;
-              const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+              const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
           _%>
            <%= relationshipFieldName %>Id : this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,
-            <%_ } _%>
+            <%_ }} _%>
          };
 
         this.<%= entityInstance %>Service.searchExample(obj).subscribe(
@@ -207,10 +207,10 @@ currentAccount: any;
                   const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
                   const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
                   const relationshipFieldName = relationships[idx].relationshipFieldName;
-                  const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                  const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
               _%>
                 <%= relationshipFieldName %>Id : this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,
-              <%_ } _%>
+              <%_ } } _%>
                 <%_ } _%>
                 sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
             }

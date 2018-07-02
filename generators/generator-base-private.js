@@ -704,6 +704,8 @@ module.exports = class extends Generator {
     generateEntityQueries(relationships, entityInstance, dto) {
         const queries = [];
         const variables = [];
+        const hasRelationshipWithCompanys = [];
+        const isCompanyRelationships = [];
         let hasManyToMany = false;
         relationships.forEach((relationship) => {
             let query;
@@ -739,18 +741,23 @@ module.exports = class extends Generator {
                     variableName += 'Collection';
                 }
                 query =
-        `this.${relationship.otherEntityName}Service.query()
+        `this.${relationship.otherEntityName}Service.query(`+(relationship.hasRelationshipWithCompany?`{"companyId.equals":this.currentAccount.companyId,"pageSize":ITEMS_QUERY_ALL}`:``)+`)
             .subscribe((res: HttpResponse<${relationship.otherEntityAngularName}[]>) => { this.${variableName} = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));`;
             }
             if (variableName && !this.contains(queries, query)) {
                 queries.push(query);
                 variables.push(`${variableName}: ${relationship.otherEntityAngularName}[];`);
+                hasRelationshipWithCompanys.push(relationship.hasRelationshipWithCompany?true:false);
+                isCompanyRelationships.push(relationship.otherEntityName === 'company'?true:false);
             }
         });
         return {
             queries,
             variables,
+            hasRelationshipWithCompanys,
+            isCompanyRelationships,
             hasManyToMany
+
         };
     }
 

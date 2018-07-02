@@ -1,3 +1,4 @@
+
 <%#
  Copyright 2013-2018 the original author or authors from the JHipster project.
 
@@ -20,11 +21,18 @@
 const query = generateEntityQueries(relationships, entityInstance, dto);
 const queries = query.queries;
 const variables = query.variables;
+
+const hasRelationshipWithCompanys = query.hasRelationshipWithCompanys;
+const isCompanyRelationships = query.isCompanyRelationships;
 let hasManyToMany = query.hasManyToMany;
 _%>
 import { Component, OnInit<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
+
+import {Principal} from '../../shared/';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import {ITEMS_QUERY_ALL} from '../../shared/';
+import {AlertService} from '../../shared/alert/alert-service';
 import { Observable } from 'rxjs';
 <%_ if ( fieldsContainInstant || fieldsContainZonedDateTime ) { _%>
 import * as moment from 'moment';
@@ -64,10 +72,13 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
 
     private _<%= entityInstance %>: <%= entityAngularName %>;
     isSaving: boolean;
+    private currentAccount : any;
     <%_
-    for ( const idx in variables ) { %>
+    for ( const idx in variables ) {
+        if(!isCompanyRelationships[idx]){
+        %>
     <%- variables[idx] %>
-    <%_ } _%>
+    <%_ }} _%>
     <%_ for ( idx in fields ) {
         const fieldName = fields[idx].fieldName;
         const fieldType = fields[idx].fieldType;
@@ -83,9 +94,10 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         private dataUtils: JhiDataUtils,
         <%_ } _%>
         <%_ if (queries && queries.length > 0) { _%>
-        private jhiAlertService: JhiAlertService,
+        private alertService: AlertService,
         <%_ } _%>
         private <%= entityInstance %>Service: <%= entityAngularName %>Service,
+        private principal : Principal,
         <%_ Object.keys(differentRelationships).forEach(key => {
             if (differentRelationships[key].some(rel => rel.relationshipType !== 'one-to-many')) {
                 const uniqueRel = differentRelationships[key][0];
@@ -107,9 +119,16 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         this.route.data.subscribe(({<%= entityInstance %>}) => {
             this.<%= entityInstance %> = <%= entityInstance %>;
         });
-        <%_ for (idx in queries) { _%>
+        this.principal.identity().then((account) => {
+            this.currentAccount = account;
+            <%_ for (idx in queries) {  if(!isCompanyRelationships[idx]&&hasRelationshipWithCompanys[idx]){_%>
+            <%- queries[idx] %>
+            <%_ }} _%>
+        });
+        <%_ for (idx in queries) {  if(!isCompanyRelationships[idx]&&!hasRelationshipWithCompanys[idx]){_%>
         <%- queries[idx] %>
-        <%_ } _%>
+        <%_ }} _%>
+
     }
 
     <%_ if (fieldsContainBlob) { _%>
@@ -149,6 +168,9 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
             this.subscribeToSaveResponse(
                 this.<%= entityInstance %>Service.update(this.<%= entityInstance %>));
         } else {
+            <%_ if (hasRelationshipWithCompany) {_%>
+            this.<%= entityInstance %>.companyId = this.currentAccount.companyId;
+            <%_}_%>
             this.subscribeToSaveResponse(
                 this.<%= entityInstance %>Service.create(this.<%= entityInstance %>));
         }
@@ -170,7 +192,7 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
     <%_ if (queries && queries.length > 0) { _%>
 
     private onError(errorMessage: string) {
-        this.jhiAlertService.error(errorMessage, null, null);
+        this.alertService.error(errorMessage, null, null);
     }
     <%_ } _%>
     <%_

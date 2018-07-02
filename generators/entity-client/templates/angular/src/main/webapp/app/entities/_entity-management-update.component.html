@@ -200,7 +200,7 @@ _%>
 
                 const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
                 const translationKey = `${i18nKeyPrefix}.${relationshipName}`; _%>
-                <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user')) { _%>
+                <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !=='company') { _%>
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
                     <%_ if (dto === 'no') { _%>
@@ -254,7 +254,7 @@ _%>
                     </select>
                 </div>
                 <%_ } _%>
-                <%_ if (relationships[idx].relationshipValidate === true) { _%>
+                <%_ if (relationships[idx].relationshipValidate === true && relationships[idx].otherEntityName !== 'company') { _%>
                 <div [hidden]="!(editForm.controls.<%= relationshipName %>?.dirty && editForm.controls.<%= relationshipName %>?.invalid)">
                     <%_ if (relationshipRequired) { _%>
                     <small class="form-text text-danger"

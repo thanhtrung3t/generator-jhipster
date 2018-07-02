@@ -133,7 +133,7 @@ limitations under the License.
             const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
             const relationshipRequired = relationships[idx].relationshipRequired;
             const translationKey = `${keyPrefix}.${relationshipName}`; _%>
-            <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user')) { _%>
+            <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !== 'company') { _%>
 
                     <%_ if (dto === 'no') { _%>
                 <div class="form-group row">
@@ -224,9 +224,9 @@ limitations under the License.
                 <th<% if (pagination !== 'no') { %> jhiSortBy="<%= fields[idx].fieldName%>"<% } %>><span jhiTranslate="<%=`${keyPrefix}.${fields[idx].fieldName}` %>"><%= fields[idx].fieldNameHumanized %></span><% if (pagination !== 'no') { %> <fa-icon [icon]="'sort'"></fa-icon><% } %></th>
                 <%_ } _%>
                 <%_ for (idx in relationships) { _%>
-                <%_ if (relationships[idx].relationshipType === 'many-to-one'
+                <%_ if ((relationships[idx].relationshipType === 'many-to-one'
                 || (relationships[idx].relationshipType === 'one-to-one' && relationships[idx].ownerSide === true)
-                || (relationships[idx].relationshipType === 'many-to-many' && relationships[idx].ownerSide === true && pagination === 'no')) {
+                || (relationships[idx].relationshipType === 'many-to-many' && relationships[idx].ownerSide === true && pagination === 'no'))&& relationships[idx].otherEntityName !== 'company') {
                 const fieldName = dto === 'no' ? "." + relationships[idx].otherEntityField : relationships[idx].otherEntityFieldCapitalized;_%>
                 <th<% if (pagination !== 'no') { %> jhiSortBy="<%=relationships[idx].relationshipName + (fieldName)%>"<% } %>><span jhiTranslate="<%= `${keyPrefix}.${relationships[idx].relationshipName}` %>"><%= relationships[idx].relationshipNameHumanized %></span><% if (pagination !== 'no') { %> <fa-icon [icon]="'sort'"></fa-icon><% } %></th>
                 <%_ } _%>
@@ -273,9 +273,9 @@ limitations under the License.
                     const otherEntityStateName = relationships[idx].otherEntityStateName;
                     const otherEntityField = relationships[idx].otherEntityField;
                     const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized; _%>
-                    <%_ if (relationshipType === 'many-to-one'
+                    <%_ if ((relationshipType === 'many-to-one'
                     || (relationshipType === 'one-to-one' && ownerSide === true)
-                    || (relationshipType === 'many-to-many' && ownerSide === true && pagination === 'no')) { _%>
+                    || (relationshipType === 'many-to-many' && ownerSide === true && pagination === 'no')) && otherEntityName !=='company') { _%>
                     <td>
                         <%_ if (otherEntityName === 'user') { _%>
                         <%_ if (relationshipType === 'many-to-many') { _%>

@@ -579,6 +579,9 @@ module.exports = class extends BaseGenerator {
                     if (relationship.relationshipType === 'many-to-one' && relationship.relationshipName.endsWith('Parent')){
                         context.hasMasterRelationship = true;
                     }
+                    if (relationship.relationshipType === 'many-to-one' && relationship.otherEntityName === 'company'){
+                        context.hasRelationshipWithCompany = true;
+                    }
 
                     if (_.isUndefined(relationship.otherEntityRelationshipNamePlural) && (relationship.relationshipType === 'one-to-many' ||
                         (relationship.relationshipType === 'many-to-many' && relationship.ownerSide === false) ||
@@ -597,6 +600,12 @@ module.exports = class extends BaseGenerator {
                     const otherEntityName = relationship.otherEntityName;
                     relationship.otherEntityAngularFileName = _.kebabCase(_.upperFirst(relationship.otherEntityName) + _.upperFirst(context.entityAngularJSSuffix));
                     const otherEntityData = this.getEntityJson(otherEntityName);
+                    relationship.otherEntityData = otherEntityData;
+                    otherEntityData.relationships.forEach((otherEntityRelationship) => {
+                        if(otherEntityRelationship.otherEntityName ==='company'){
+                            relationship.hasRelationshipWithCompany = true;
+                        }
+                    });
                     const jhiTablePrefix = context.jhiTablePrefix;
 
                     if (context.dto && context.dto === 'mapstruct') {

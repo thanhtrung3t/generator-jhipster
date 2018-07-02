@@ -238,7 +238,7 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
                 const ownerSide = relationships[idx].ownerSide; _%>
             <%_ if (relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true)) { _%>
             if(searchDto.get<%=relationshipNameCapitalized%>Id() !=null) {
-                boolQueryBuilder.must(QueryBuilders.matchQuery("<%=relationshipFieldName%>.Id", searchDto.get<%=relationshipNameCapitalized%>Id()));
+                boolQueryBuilder.must(QueryBuilders.matchQuery("<%=relationshipFieldName%>.id", searchDto.get<%=relationshipNameCapitalized%>Id()));
             }
             <%_ } _%>
             <%_ } _%>

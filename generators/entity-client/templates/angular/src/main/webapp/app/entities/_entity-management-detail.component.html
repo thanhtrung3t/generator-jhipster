@@ -66,9 +66,9 @@
         const otherEntityStateName = relationships[idx].otherEntityStateName;
         const otherEntityField = relationships[idx].otherEntityField;
         const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-        if (relationshipType === 'many-to-one'
+        if ((relationshipType === 'many-to-one'
         || (relationshipType === 'one-to-one' && ownerSide === true)
-        || (relationshipType === 'many-to-many' && ownerSide === true)) { _%>
+        || (relationshipType === 'many-to-many' && ownerSide === true))&& otherEntityName !== 'company') { _%>
         <dt><span jhiTranslate="<%= keyPrefix %>.<%= relationshipName %>"><%= relationshipNameHumanized %></span></dt>
         <dd>
             <%_ if (otherEntityName === 'user') { _%>

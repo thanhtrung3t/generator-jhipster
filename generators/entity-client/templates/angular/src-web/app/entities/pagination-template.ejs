@@ -1,0 +1,251 @@
+<%#
+ Copyright 2013-2018 the original author or authors from the JHipster project.
+
+ This file is part of the JHipster project, see http://www.jhipster.tech/
+ for more information.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-%>
+<%_
+const i18nToLoad = [entityInstance];
+for (const idx in fields) {
+    if (fields[idx].fieldIsEnum === true) {
+        i18nToLoad.push(fields[idx].enumInstance);
+    }
+}
+_%>
+
+currentAccount: any;
+    <%= entityInstancePlural %>: <%= entityAngularName %>[];
+    error: any;
+    success: any;
+    eventSubscriber: Subscription;
+    <%_ if (searchEngine === 'elasticsearch') { _%>
+    currentSearch: string;
+    <%_ } _%>
+    <%_ if (databaseType !== 'cassandra') { _%>
+    routeData: any;
+    links: any;
+    totalItems: any;
+    queryCount: any;
+    itemsPerPage: any;
+    page: any;
+    predicate: any;
+    previousPage: any;
+    reverse: any;
+    <%= entityInstance %>Search : <%= entityAngularName %>Search;
+    <%_ for (idx in relationships) {
+        const relationshipType = relationships[idx].relationshipType;
+        const ownerSide = relationships[idx].ownerSide;
+        const otherEntityName = relationships[idx].otherEntityName;
+        const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+        const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+        const relationshipName = relationships[idx].relationshipName;
+        const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+        const relationshipFieldName = relationships[idx].relationshipFieldName;
+        const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+        const otherEntityField = relationships[idx].otherEntityField;
+        const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+        const relationshipRequired = relationships[idx].relationshipRequired;
+        if(otherEntityName !== 'company'){
+        _%>
+
+    <%= otherEntityNamePlural %> : <%=otherEntityNameCapitalized %>[];
+    <%_ } }_%>
+    @ViewChild(NgForm) searchForm: NgForm;
+    <%_ } _%>
+
+    constructor(
+        private <%= entityInstance %>Service: <%= entityAngularName %>Service,
+        private parseLinks: JhiParseLinks,
+        private principal: Principal,
+        private activatedRoute: ActivatedRoute,
+        private alertService :AlertService,
+        <%_ if (fieldsContainBlob) { _%>
+        private dataUtils: JhiDataUtils,
+        <%_ } _%>
+        private router: Router,
+        private eventManager: JhiEventManager,
+        <%_ for (idx in relationships) {
+            const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired;  if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){ _%>
+        private <%= otherEntityName %>Service: <%= otherEntityNameCapitalized %>Service,
+        <%_ }} _%>
+
+        private <%= entityInstance %>PopupService: <%= entityAngularName %>PopupService
+    ) {
+        <%_ if (databaseType !== 'cassandra') { _%>
+        this.itemsPerPage = ITEMS_PER_PAGE;
+        this.routeData = this.activatedRoute.data.subscribe((data) => {
+            this.page = data.pagingParams.page;
+            this.previousPage = data.pagingParams.page;
+            this.reverse = data.pagingParams.ascending;
+            this.predicate = data.pagingParams.predicate;
+
+        });
+        <%_ for (idx in relationships) {
+                const relationshipType = relationships[idx].relationshipType;
+                const ownerSide = relationships[idx].ownerSide;
+                const otherEntityName = relationships[idx].otherEntityName;
+                const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                const relationshipName = relationships[idx].relationshipName;
+                const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+                const relationshipFieldName = relationships[idx].relationshipFieldName;
+                const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                const otherEntityField = relationships[idx].otherEntityField;
+                const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                const relationshipRequired = relationships[idx].relationshipRequired;    if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){_%>
+        this.<%= otherEntityNamePlural %> =[];
+       <%_ }} _%>
+
+        this.<%= entityInstance %>Search = new <%= entityAngularName %>Search();
+
+        <%_ if (searchEngine === 'elasticsearch') { _%>
+         <%_ for (idx in fields) {
+             const fieldName = fields[idx].fieldName;
+             const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+          _%>
+        this.<%= entityInstance %>Search.<%=fieldName%> = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= fieldName %>'] ?
+                        this.activatedRoute.snapshot.params[' <%= fieldName %>'] : '';
+         <%_ } _%>
+         <%_ for (idx in relationships) {
+                       const relationshipType = relationships[idx].relationshipType;
+                       const ownerSide = relationships[idx].ownerSide;
+                       const otherEntityName = relationships[idx].otherEntityName;
+                       const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                       const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                       const relationshipFieldName = relationships[idx].relationshipFieldName;
+                       const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){
+                   _%>
+        this.<%= entityInstance %>Search.<%=relationshipFieldName%>Id = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] ?
+                         this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] : '';
+         <%_ }} _%>
+        <%_ } _%>
+        <%_ } _%>
+    }
+
+    loadAll() {
+        <%_ if (searchEngine === 'elasticsearch') { _%>
+         var obj = {
+         page: this.page -1,
+         size: this.itemsPerPage,
+         sort: this.sort(),
+          <%_ for (idx in fields) {
+             const fieldName = fields[idx].fieldName;
+             const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+          _%>
+         <%= fieldName %> : this.<%= entityInstance %>Search.<%= fieldName %>,
+          <%_ } _%>
+          <%_ for (idx in relationships) {
+              const relationshipType = relationships[idx].relationshipType;
+              const ownerSide = relationships[idx].ownerSide;
+              const otherEntityName = relationships[idx].otherEntityName;
+              const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+              const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+              const relationshipFieldName = relationships[idx].relationshipFieldName;
+              const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
+          _%>
+         <%=relationshipFieldName %>Id : <%_ if(otherEntityName === 'company'){_%> this.currentAccount.companyId, <%_ } else { _%>this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,<%_ } _%>
+
+            <%_ }} _%>
+         };
+
+        this.<%= entityInstance %>Service.searchExample(obj).subscribe(
+          (res: HttpResponse<<%= entityAngularName %>[]>) => this.onSuccess(res.body, res.headers),
+          (res: HttpErrorResponse) => this.onError(res.message)
+        );
+        <%_ } _%>
+
+    }
+    searchInForm(){
+          this.page = 0;
+          this.transition();
+
+    }
+    <%_ if (databaseType !== 'cassandra') { _%>
+    loadPage(page: number) {
+        if (page !== this.previousPage) {
+            this.previousPage = page;
+            this.transition();
+        }
+    }
+    transition() {
+        this.router.navigate(['/setup/<%= entityUrl %>'], {queryParams:
+            {
+                page: this.page,
+                size: this.itemsPerPage,
+                <%_ if (searchEngine === 'elasticsearch') { _%>
+                search: this.currentSearch,
+             <%_ for (idx in fields) {
+                 const fieldName = fields[idx].fieldName;
+                 const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+              _%>
+                <%= fieldName %> : this.<%= entityInstance %>Search.<%= fieldName %>,
+              <%_ } _%>
+              <%_ for (idx in relationships) {
+                  const relationshipType = relationships[idx].relationshipType;
+                  const ownerSide = relationships[idx].ownerSide;
+                  const otherEntityName = relationships[idx].otherEntityName;
+                  const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                  const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                  const relationshipFieldName = relationships[idx].relationshipFieldName;
+                  const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one'){
+              _%>
+                <%= relationshipFieldName %>Id : <%_ if(otherEntityName === 'company'){_%> this.currentAccount.companyId, <%_ } else { _%>this.<%= entityInstance %>Search.<%= relationshipFieldName %>Id,<%_ } _%>
+
+              <%_ } } _%>
+                <%_ } _%>
+                sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
+            }
+        });
+        this.loadAll();
+    }
+
+    clear() {
+        this.page = 0;
+        <%_ if(searchEngine === 'elasticsearch') { _%>
+        this.currentSearch = '';
+        <%_ } _%>
+        this.router.navigate(['/setup/<%= entityUrl %>', {
+            page: this.page,
+            sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
+        }]);
+        this.loadAll();
+    }
+    <%_ } _%>
+    <%_ if(searchEngine === 'elasticsearch') { _%>
+    search(query) {
+        if (!query) {
+            return this.clear();
+        }
+        this.page = 0;
+        this.currentSearch = query;
+        this.router.navigate(['/setup/<%= entityUrl %>', {
+            search: this.currentSearch,
+            page: this.page,
+            sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
+        }]);
+        this.loadAll();
+    }
+    <%_ } _%>

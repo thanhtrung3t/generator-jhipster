@@ -1,0 +1,75 @@
+<%#
+ Copyright 2013-2018 the original author or authors from the JHipster project.
+
+ This file is part of the JHipster project, see http://www.jhipster.tech/
+ for more information.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-%>
+<%_
+const i18nToLoad = [entityInstance];
+
+for (const idx in fields) {
+    if (fields[idx].fieldIsEnum === true) {
+        i18nToLoad.push(fields[idx].enumInstance);
+    }
+}
+_%>
+
+    currentAccount: any;
+    <%= entityInstancePlural %>: <%= entityAngularName %>[];
+    eventDeleteItemSubscriber: Subscription;
+    eventUpdateItemSubscriber: Subscription;
+    <%_ for (idx in relationships) {
+            const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired;  if(relationshipType === 'many-to-one'  && relationshipName.endsWith('Parent')){ parentRelationshipName = relationshipName; _%>
+
+        <%_ }} _%>
+    @Input() <%=parentRelationshipName%>Id: number;
+    constructor(
+        private eventManager : JhiEventManager,
+        private <%= entityInstance %>DetailPopupService :<%= entityAngularName %>DetailPopupService,
+        private <%= entityInstance %>Service: <%= entityAngularName %>Service,
+        private jhiAlertService :JhiAlertService,
+        <%_ if (fieldsContainBlob) { _%>
+        private dataUtils: JhiDataUtils,
+        <%_ } _%>
+
+    ) {
+
+
+    }
+
+    createDetailForm(){
+        this.<%= entityInstance %>DetailPopupService.open(<%= entityAngularName %>DetailUpdateComponent as Component,null,this.<%=parentRelationshipName%>Id)
+    }
+    editDetailForm(<%=entityInstance%>Id:number){
+        this.<%= entityInstance %>DetailPopupService.open(<%= entityAngularName %>DetailUpdateComponent as Component,<%=entityInstance%>Id,this.<%=parentRelationshipName%>Id)
+    }
+
+    deleteDetailForm(<%=entityInstance%>Id:number){
+        this.<%= entityInstance %>DetailPopupService
+          .open(<%= entityAngularName %>DetailDeleteDialogComponent as Component, <%=entityInstance%>Id);
+    }
+
+

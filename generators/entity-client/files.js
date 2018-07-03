@@ -42,49 +42,49 @@ const angularjsFiles = {
                     file: 'entities/_entity-management.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityPluralFileName}.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityPluralFileName}.html`
                 },
                 {
                     file: 'entities/_entity-management-detail.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-detail.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-detail.html`
                 },
                 {
                     file: 'entities/_entity-management-dialog.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-dialog.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-dialog.html`
                 },
                 {
                     file: 'entities/_entity-management-delete-dialog.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.html`
                 },
                 {
                     file: 'entities/_entity-management.state.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.state.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.state.js`
                 },
                 {
                     file: 'entities/_entity-management.controller.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.controller.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.controller.js`
                 },
                 {
                     file: 'entities/_entity-management-dialog.controller.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-dialog.controller.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-dialog.controller.js`
                 },
                 {
                     file: 'entities/_entity-management-delete-dialog.controller.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.controller.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.controller.js`
                 },
                 {
                     file: 'entities/_entity-management-detail.controller.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-detail.controller.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-detail.controller.js`
                 },
                 {
                     file: 'entities/_entity.service.js',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}.service.js`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityServiceFileName}.service.js`
                 }
 
             ]
@@ -94,7 +94,7 @@ const angularjsFiles = {
             path: ANGULAR_DIR,
             templates: [{
                 file: 'entities/_entity-search.service.js',
-                renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}.search.service.js`
+                renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityServiceFileName}.search.service.js`
             }]
         }
 
@@ -127,69 +127,69 @@ const angularFiles = {
                     file: 'entities/_entity-management.component.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.component.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.component.html`
                 },
                 {
                     file: 'entities/_entity-management-detail.component.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-detail.component.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-detail.component.html`
                 },
                 {
                     file: 'entities/_entity-management-update.component.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-update.component.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-update.component.html`
                 },
                 {
                     file: 'entities/_entity-management-delete-dialog.component.html',
                     method: 'processHtml',
                     template: true,
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.html`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.html`
                 },
                 {
                     file: 'entities/_index.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/index.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/index.ts`
                 },
                 {
                     file: 'entities/_entity-management.module.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.module.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.module.ts`
                 },
                 {
                     file: 'entities/_entity-management.route.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.route.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.route.ts`
                 },
                 {
                     file: 'entities/_entity.model.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.model.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.model.ts`
                 },
                 {
                     file: 'entities/_entity.search.model.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.search.model.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.search.model.ts`
                 },
                 {
                     file: 'entities/_entity-management.component.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.component.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.component.ts`
                 },
                 {
                     file: 'entities/_entity-management-delete-dialog.component.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.ts`
                 },
                 {
                     file: 'entities/_entity-management-update.component.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-update.component.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-update.component.ts`
                 },
                 {
                     file: 'entities/_entity-management-detail.component.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-detail.component.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-detail.component.ts`
                 },
                 {
                     file: 'entities/_entity.service.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}.service.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityServiceFileName}.service.ts`
                 },
                 {
                     file: 'entities/_entity-popup.service.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityServiceFileName}-popup.service.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityServiceFileName}-popup.service.ts`
                 }
 
             ]
@@ -199,40 +199,40 @@ const angularFiles = {
             path: ANGULAR_DIR,
             templates: [{
                 file: 'entities/master-detail/_entity-management-detail.module.ts',
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail.module.ts`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail.module.ts`
             },{
                 file: 'entities/master-detail/_entity-management-detail-list.component.ts',
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.ts`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.ts`
             },{
                 file: 'entities/master-detail/_entity-management-detail-list.component.html',
                 method: 'processHtml',
                 template: true,
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.html`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-list.component.html`
             },{
                 file: 'entities/master-detail/_entity-management-detail-update.component.html',
                 method: 'processHtml',
                 template: true,
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.html`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.html`
             },{
                 file: 'entities/master-detail/_entity-management-detail-update.component.ts',
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.ts`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-update.component.ts`
             },{
                 file: 'entities/master-detail/_entity-management-detail-delete-dialog.component.ts',
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.ts`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.ts`
             },
             {
                 file: 'entities/master-detail/_entity-management-detail-delete-dialog.component.html',
                 method: 'processHtml',
                 template: true,
-                renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.html`
+                renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-delete-dialog.component.html`
             },
             {
                     file: 'entities/master-detail/_entity-detail-popup.service.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-popup.service.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}-detail/${generator.entityServiceFileName}-detail-popup.service.ts`
                 },
             {
                     file: 'entities/master-detail/_index.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}-detail/index.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}-detail/index.ts`
                 }
             ]
         }
@@ -281,27 +281,27 @@ const reactFiles = {
             templates: [
                 {
                     file: 'entities/_entity-delete-dialog.tsx',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.tsx`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.tsx`
                 },
                 {
                     file: 'entities/_entity-detail.tsx',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-detail.tsx`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-detail.tsx`
                 },
                 {
                     file: 'entities/_entity-dialog.tsx',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}-dialog.tsx`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}-dialog.tsx`
                 },
                 {
                     file: 'entities/_entity.tsx',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.tsx`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.tsx`
                 },
                 {
                     file: 'entities/_entity.reducer.ts',
-                    renameTo: generator => `entities/${generator.entityFolderName}/${generator.entityFileName}.reducer.ts`
+                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.reducer.ts`
                 },
                 {
                     file: 'entities/_index.tsx',
-                    renameTo: generator => `entities/${generator.entityFolderName}/index.tsx`
+                    renameTo: generator => `customer/${generator.entityFolderName}/index.tsx`
                 }
             ]
         }

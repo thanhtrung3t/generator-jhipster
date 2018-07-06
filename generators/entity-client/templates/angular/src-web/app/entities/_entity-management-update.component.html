@@ -22,7 +22,7 @@ _%>
 
 
 
-<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+<form name="editForm" role="form" class="form-horizontal" novalidate (ngSubmit)="save()" #editForm="ngForm">
 <div class="card">
     <div class="card-header">
         <strong jhiTranslate="<%= i18nKeyPrefix %>.home.createOrEditLabel">Create or edit a <%= entityClassHumanized %></strong>
@@ -56,8 +56,9 @@ _%>
                         fieldInputType = 'hidden';
                     }
                 _%>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= fieldName %>"<% if (fields[idx].javadoc) { if (enableTranslation) { %> [ngbTooltip]="'<%= i18nKeyPrefix %>.help.<%= fieldName %>' | translate"<% } else { %> ngbTooltip="<%= fields[idx].javadoc %>"<% } } %>><%= fieldNameHumanized %></label>
+                <div class="form-group row">
+                    <label class="col-md-2 form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= fieldName %>"<% if (fields[idx].javadoc) { if (enableTranslation) { %> [ngbTooltip]="'<%= i18nKeyPrefix %>.help.<%= fieldName %>' | translate"<% } else { %> ngbTooltip="<%= fields[idx].javadoc %>"<% } } %>><%= fieldNameHumanized %></label>
+                    <div class="col-md-4">
                     <%_ if (fields[idx].fieldIsEnum) { _%>
                     <select class="form-control" name="<%= fieldName %>" [(ngModel)]="<%= entityInstance %>.<%= fieldName %>" id="field_<%= fieldName %>" <% if (fields[idx].fieldValidate === true && fields[idx].fieldValidateRules.includes('required')) { %> required<% } %>>
                     <%_ const enumPrefix = angularAppName + '.'+ fieldType;
@@ -181,6 +182,7 @@ _%>
                         <%_ } _%>
                     </div>
                     <%_ } _%>
+                    </div>
                 </div>
                 <%_ } _%>
 
@@ -201,8 +203,9 @@ _%>
                 const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
                 const translationKey = `${i18nKeyPrefix}.${relationshipName}`; _%>
                 <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !=='company') { _%>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                <div class="form-group row">
+                    <label class="col-md-2 form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                    <div class="col-md-4">
                     <%_ if (dto === 'no') { _%>
                     <select class="form-control" id="field_<%= relationshipName %>" name="<%= relationshipName %>" [(ngModel)]="<%= entityInstance %>.<%=relationshipFieldName %>" <% if (relationshipRequired) { %> required<% } %>>
                         <%_ if (!relationshipRequired) { _%>
@@ -222,10 +225,12 @@ _%>
                         <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=otherEntityNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.name}}</option>
                     </select>
                     <%_ } _%>
+                    </div>
                 </div>
                 <%_ } else if (relationshipType === 'one-to-one' && ownerSide === true) { _%>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                <div class="form-group row">
+                    <label class="col-md-2 form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                    <div class="col-md-4">
                     <%_ if (dto === 'no') { _%>
                     <select class="form-control" id="field_<%= relationshipName %>" name="<%= relationshipName %>" [(ngModel)]="<%= entityInstance %>.<%=relationshipFieldName %>"<% if (relationshipRequired) { %> required<% } %>>
                         <%_ if (!relationshipRequired) { _%>
@@ -245,13 +250,16 @@ _%>
                         <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=relationshipFieldNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.name}}</option>
                     </select>
                     <%_ } _%>
+                    </div>
                 </div>
                 <%_ } else if (relationshipType === 'many-to-many' && relationships[idx].ownerSide === true) { _%>
-                <div class="form-group">
-                    <label jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                <div class="form-group row">
+                    <label class="col-md-2 form-control-label" jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
+                    <div class="col-md-4">
                     <select class="form-control" id="field_<%= relationshipName %>" multiple name="<%= relationshipName %>" [(ngModel)]="<%=entityInstance %>.<%=relationshipFieldNamePlural %>"<% if (relationshipRequired) { %> required<% } %>>
                         <option [ngValue]="getSelected(<%=entityInstance %>.<%=relationshipFieldNamePlural %>, <%=otherEntityName %>Option)" *ngFor="let <%=otherEntityName %>Option of <%=otherEntityNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.<%=otherEntityField %>}}</option>
                     </select>
+                    </div>
                 </div>
                 <%_ } _%>
                 <%_ if (relationships[idx].relationshipValidate === true && relationships[idx].otherEntityName !== 'company') { _%>
@@ -288,11 +296,11 @@ _%>
     <%_ }} _%>
     </div>
     <div class="card-footer">
-        <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
-            <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
         <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-            <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+            <i class="fa fa-dot-circle-o"></i>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+        <button type="reset" class="btn btn-danger" id="cancel-save" (click)="previousState()">
+            <i class="fa fa-undo"></i>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
     </div>
 </div>

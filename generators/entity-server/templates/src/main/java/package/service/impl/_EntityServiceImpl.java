@@ -224,6 +224,10 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
             if(StringUtils.isNotBlank(searchDto.get<%=fieldInJavaBeanMethod%>())) {
                  boolQueryBuilder.must(QueryBuilders.wildcardQuery("<%=fieldName%>", "*"+searchDto.get<%=fieldInJavaBeanMethod%>()+"*"));
             }
+            <%_ } else {_%>
+                if(searchDto.get<%=fieldInJavaBeanMethod%>()) !=null){
+                boolQueryBuilder.must(QueryBuilders.matchQuery("<%=fieldName%>",searchDto.get<%=fieldInJavaBeanMethod%>()));
+            }
             <%_ } _%>
             <%_ } _%>
             <%_ for (idx in relationships) {

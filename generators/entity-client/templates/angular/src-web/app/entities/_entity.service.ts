@@ -31,7 +31,7 @@ import { SERVER_API_URL } from '../../app.constants';
 import { JhiDateUtils } from 'ng-jhipster';
 <%_ } _%>
 
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
+import { <%= entityAngularName %> } from '../model/<%= entityFileName %>.model';
 import { createRequestOption } from '../../shared';
 
 export type EntityResponseType = HttpResponse<<%= entityAngularName %>>;

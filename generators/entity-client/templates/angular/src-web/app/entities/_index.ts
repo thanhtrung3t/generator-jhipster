@@ -16,10 +16,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-export * from './<%= entityFileName %>.model';
-export * from './<%= entityFileName %>.search.model';
 export * from './<%= entityFileName %>-popup.service';
-export * from './<%= entityFileName %>.service';
 export * from './<%= entityFileName %>-update.component';
 export * from './<%= entityFileName %>-delete-dialog.component';
 export * from './<%= entityFileName %>-detail.component';

@@ -39,8 +39,8 @@ import { JhiEventManager<% if (queries && queries.length > 0) { %>, JhiAlertServ
     import * as moment from 'moment';
     import { DATE_TIME_FORMAT } from '../../shared/constants/input.constants';
     <%_ } _%>
-import { <%= entityAngularName %> } from '../<%= entityFileName %>/<%= entityFileName %>.model';
-import { <%= entityAngularName %>Service } from '../<%= entityFileName %>/<%= entityFileName %>.service';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 <%_
 let hasRelationshipQuery = false;
 Object.keys(differentRelationships).forEach(key => {
@@ -55,8 +55,9 @@ Object.keys(differentRelationships).forEach(key => {
         const uniqueRel = differentRelationships[key][0];
         if (uniqueRel.otherEntityAngularName !== entityAngularName) {
 _%>
-import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
-<%_     }
+import { <%= uniqueRel.otherEntityAngularName%>Service } from '../../shared/service/<%= uniqueRel.otherEntityModulePath %>.service';
+import {<%= uniqueRel.otherEntityAngularName %>  } from '../../shared/model/<%= uniqueRel.otherEntityModulePath %>.model';
+            <%_     }
     }
 }); _%>
 

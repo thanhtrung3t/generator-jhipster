@@ -42,9 +42,9 @@ import { DATE_TIME_FORMAT } from '../../shared/constants/input.constants';
 import { <% if (queries && queries.length > 0) { %>JhiAlertService, <% } %><% if (fieldsContainBlob) { %>JhiDataUtils<% } %> } from 'ng-jhipster';
 <%_ } _%>
 
-import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
 <%_
 let hasRelationshipQuery = false;
 Object.keys(differentRelationships).forEach(key => {
@@ -59,7 +59,8 @@ Object.keys(differentRelationships).forEach(key => {
         const uniqueRel = differentRelationships[key][0];
         if (uniqueRel.otherEntityAngularName !== entityAngularName) {
             _%>
-            import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
+            import { <%= uniqueRel.otherEntityAngularName %> } from '../../shared/model/<%= uniqueRel.otherEntityModulePath %>.model';
+            import { <%= uniqueRel.otherEntityAngularName%>Service} from '../../shared/service/<%= uniqueRel.otherEntityModulePath %>.service';
             <%_     }
     }
 }); _%>

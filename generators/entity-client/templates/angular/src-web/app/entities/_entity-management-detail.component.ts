@@ -30,8 +30,8 @@ import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager<% if (fieldsContainBlob) { %>, JhiDataUtils<% } %> } from 'ng-jhipster';
 
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
-import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 
 @Component({
     selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>-detail',

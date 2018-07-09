@@ -19,6 +19,7 @@ limitations under the License.
 -%>
 import { Component, OnInit,Input, OnDestroy,ViewChild } from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import {AlertService} from '../../shared/alert/alert-service';
 <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
     import { ActivatedRoute, Router } from '@angular/router';
     import {NgForm} from '@angular/forms';
@@ -28,9 +29,9 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, <% if (pagination !== 'no') { %>JhiParseLinks, <% } %>JhiAlertService<% if (fieldsContainBlob) { %>, JhiDataUtils<% } %> } from 'ng-jhipster';
 
-import { <%= entityAngularName %> } from '../<%= entityFolderName %>/<%= entityFileName %>.model';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
 import { <%= entityAngularName %>DetailPopupService } from './<%= entityFileName %>-detail-popup.service';
-import { <%= entityAngularName %>Service } from '../<%= entityFolderName %>/<%= entityFileName %>.service';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 import { <%= entityAngularName %>DetailUpdateComponent} from './<%= entityFileName %>-detail-update.component';
 import { <%= entityAngularName %>DetailDeleteDialogComponent } from './<%= entityFileName %>-detail-delete-dialog.component';
 
@@ -59,7 +60,8 @@ Object.keys(differentRelationships).forEach(key => {
     const uniqueRel = differentRelationships[key][0];
     if(!uniqueRel.relationshipName.endsWith('Parent')){
     _%>
-    import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
+    import { <%= uniqueRel.otherEntityAngularName %> } from '../../shared/model/<%= uniqueRel.otherEntityModulePath %>.model';
+    import { <%= uniqueRel.otherEntityAngularName%>Service } from '../../shared/service/<%= uniqueRel.otherEntityModulePath %>.service';
     <%_}}); _%>
 
 
@@ -83,12 +85,12 @@ export class <%= entityAngularName %>DetailListComponent implements OnInit, OnDe
 
         this.eventDeleteItemSubscriber = this.eventManager.subscribe('<%= entityFileName %>-detail-delete-item',()=>{
             if(this.<%=parentRelationshipName%>Id){
-                this.detailFormService.query({"<%=parentRelationshipName%>Id.equals":this.<%=parentRelationshipName%>Id, size: 10000}).subscribe((res: HttpResponse<<%= entityAngularName %>[]>) => { this.<%= entityInstancePlural %>  = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
+                this.<%= entityInstance %>Service.query({"<%=parentRelationshipName%>Id.equals":this.<%=parentRelationshipName%>Id, size: 10000}).subscribe((res: HttpResponse<<%= entityAngularName %>[]>) => { this.<%= entityInstancePlural %>  = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
             }
         });
         this.eventUpdateItemSubscriber = this.eventManager.subscribe('<%= entityFileName %>-detail.save.success',()=>{
             if(this.<%=parentRelationshipName%>Id){
-                this.detailFormService.query({"<%=parentRelationshipName%>Id.equals":this.<%=parentRelationshipName%>Id, size: 10000}).subscribe((res: HttpResponse<<%= entityAngularName %>[]>) => { this.<%= entityInstancePlural %> = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
+                this.<%= entityInstance %>Service.query({"<%=parentRelationshipName%>Id.equals":this.<%=parentRelationshipName%>Id, size: 10000}).subscribe((res: HttpResponse<<%= entityAngularName %>[]>) => { this.<%= entityInstancePlural %> = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
             }
         });
     }
@@ -108,7 +110,7 @@ export class <%= entityAngularName %>DetailListComponent implements OnInit, OnDe
     <%_ } _%>
 
     private onError(error) {
-        this.jhiAlertService.error(error.message, null, null);
+        this.alertService.error(error.message, null, null);
     }
 
 }

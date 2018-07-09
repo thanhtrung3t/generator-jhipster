@@ -161,11 +161,11 @@ const angularFiles = {
                 },
                 {
                     file: 'entities/_entity.model.ts',
-                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.model.ts`
+                    renameTo: generator => `shared/model/${generator.entityFileName}.model.ts`
                 },
                 {
                     file: 'entities/_entity.search.model.ts',
-                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityFileName}.search.model.ts`
+                    renameTo: generator => `shared/model/${generator.entityFileName}.search.model.ts`
                 },
                 {
                     file: 'entities/_entity-management.component.ts',
@@ -185,7 +185,7 @@ const angularFiles = {
                 },
                 {
                     file: 'entities/_entity.service.ts',
-                    renameTo: generator => `customer/${generator.entityFolderName}/${generator.entityServiceFileName}.service.ts`
+                    renameTo: generator => `shared/service/${generator.entityServiceFileName}.service.ts`
                 },
                 {
                     file: 'entities/_entity-popup.service.ts',
@@ -238,39 +238,7 @@ const angularFiles = {
         }
     ],
     test: [
-        {
-            path: CLIENT_TEST_SRC_DIR,
-            templates: [
-                {
-                    file: 'spec/app/entities/_entity-management-detail.component.spec.ts',
-                    renameTo: generator => `spec/app/entities/${generator.entityFolderName}/${generator.entityFileName}-detail.component.spec.ts`
-                },
-                {
-                    file: 'spec/app/entities/_entity-management-dialog.component.spec.ts',
-                    renameTo: generator => `spec/app/entities/${generator.entityFolderName}/${generator.entityFileName}-dialog.component.spec.ts`
-                },
-                {
-                    file: 'spec/app/entities/_entity-management-delete-dialog.component.spec.ts',
-                    renameTo: generator => `spec/app/entities/${generator.entityFolderName}/${generator.entityFileName}-delete-dialog.component.spec.ts`
-                },
-                {
-                    file: 'spec/app/entities/_entity-management.component.spec.ts',
-                    renameTo: generator => `spec/app/entities/${generator.entityFolderName}/${generator.entityFileName}.component.spec.ts`
-                },
-                {
-                    file: 'spec/app/entities/_entity-management.service.spec.ts',
-                    renameTo: generator => `spec/app/entities/${generator.entityFolderName}/${generator.entityFileName}.service.spec.ts`
-                }
-            ]
-        },
-        {
-            condition: generator => generator.protractorTests,
-            path: CLIENT_TEST_SRC_DIR,
-            templates: [{
-                file: 'e2e/entities/_entity.spec.ts',
-                renameTo: generator => `e2e/entities/${generator.entityFileName}.spec.ts`
-            }]
-        }
+
     ]
 };
 

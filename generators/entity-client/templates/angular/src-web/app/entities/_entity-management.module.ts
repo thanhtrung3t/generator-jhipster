@@ -18,7 +18,6 @@ limitations under the License.
 -%>
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { <%= angularXAppName %>SharedModule } from '../../shared';
 <%_ Object.keys(differentRelationships).forEach(key => {
     if (key === 'User') { _%>
@@ -41,7 +40,7 @@ for (idx in relationships) {
     const relationshipRequired = relationships[idx].relationshipRequired;
     const otherEntityRelationshipName = relationships[idx].otherEntityRelationshipName;
     if(relationshipType === 'one-to-many'  && relationshipName.endsWith('DetailList') && otherEntityRelationshipName.endsWith('Parent')){ _%>
-    import <%= angularXAppName %><%=otherEntityNameCapitalized%>DetailModule from '../<%=otherEntityAngularFileName%>-detail';
+    import {<%= angularXAppName %><%=otherEntityNameCapitalized%>DetailModule} from '../<%=otherEntityAngularFileName%>-detail/<%=otherEntityAngularFileName%>-detail.module';
     <%_ }} _%>
 import {
 <%= entityAngularName %>Component,

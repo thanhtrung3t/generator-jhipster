@@ -50,7 +50,7 @@ _%>
         private eventManager : JhiEventManager,
         private <%= entityInstance %>DetailPopupService :<%= entityAngularName %>DetailPopupService,
         private <%= entityInstance %>Service: <%= entityAngularName %>Service,
-        private jhiAlertService :JhiAlertService,
+        private alertService :AlertService,
         <%_ if (fieldsContainBlob) { _%>
         private dataUtils: JhiDataUtils,
         <%_ } _%>

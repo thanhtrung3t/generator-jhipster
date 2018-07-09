@@ -30,18 +30,20 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, <% if (pagination !== 'no') { %>JhiParseLinks, <% } %>JhiAlertService<% if (fieldsContainBlob) { %>, JhiDataUtils<% } %> } from 'ng-jhipster';
 
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
 import { <%= entityAngularName %>PopupService } from './<%= entityFileName %>-popup.service';
-import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 import { <%= entityAngularName %>DeleteDialogComponent } from './<%= entityFileName %>-delete-dialog.component';
 import { <% if (pagination !== 'no') { %>ITEMS_PER_PAGE, <% } %>Principal } from '../../shared';
-import {<%= entityAngularName %>Search} from './<%= entityFileName %>.search.model';
+import {<%= entityAngularName %>Search} from '../../shared/model/<%= entityFileName %>.search.model';
 <%_
 let hasRelationshipQuery = false;
 Object.keys(differentRelationships).forEach(key => {
     const uniqueRel = differentRelationships[key][0];
     _%>
-    import { <%= uniqueRel.otherEntityAngularName %>, <%= uniqueRel.otherEntityAngularName%>Service } from '../<%= uniqueRel.otherEntityModulePath %>';
+    import { <%= uniqueRel.otherEntityAngularName %> } from '../../shared/model/<%= uniqueRel.otherEntityModulePath %>.model';
+    import { <%= uniqueRel.otherEntityAngularName%>Service } from '../../shared/service/<%= uniqueRel.otherEntityModulePath %>.service';
+
 <%_}); _%>
 
 

@@ -23,8 +23,8 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@a
     <%_ } _%>
 import { UserRouteAccessService } from '../../shared';
 import { Observable } from 'rxjs';
-import { <%= entityAngularName %> } from './<%= entityFileName %>.model';
-import { <%= entityAngularName %>Service } from './<%= entityFileName %>.service';
+import { <%= entityAngularName %> } from '../../shared/model/<%= entityFileName %>.model';
+import { <%= entityAngularName %>Service } from '../../shared/service/<%= entityFileName %>.service';
 import { <%= entityAngularName %>Component } from './<%= entityFileName %>.component';
 import { <%= entityAngularName %>DetailComponent } from './<%= entityFileName %>-detail.component';
 import { <%= entityAngularName %>UpdateComponent } from './<%= entityFileName %>-update.component';

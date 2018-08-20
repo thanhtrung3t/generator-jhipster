@@ -52,6 +52,7 @@ import javax.validation.constraints.*;
 
 <%_ if (searchEngine === 'elasticsearch' && databaseType !== 'mongodb') { _%>
 import org.springframework.data.elasticsearch.annotations.Document;
+import vn.nextlogix.config.ElasticSearchUpdater;
 <%_ } _%>
 import java.io.Serializable;
 <%_ if (fieldsContainBigDecimal === true) { _%>
@@ -108,7 +109,9 @@ import static org.springframework.data.couchbase.core.mapping.id.GenerationStrat
 @Table(name = "<%= entityInstance %>")
 <%_ } if (searchEngine === 'elasticsearch' && databaseType === 'mongodb') { _%>
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "<%= entityInstance.toLowerCase() %>")
+
 <%_ } if (searchEngine === 'elasticsearch' && databaseType !== 'mongodb') { _%>
+@EntityListeners(ElasticSearchUpdater.class)
 @Document(indexName = "<%= entityInstance.toLowerCase() %>")
 <%_ } _%>
 public class <%= entityClass %> implements Serializable {

@@ -44,7 +44,9 @@ currentAccount: any;
     previousPage: any;
     reverse: any;
     <%= entityInstance %>Search : <%= entityAngularName %>Search;
-    <%_ for (idx in relationships) {
+    <%_
+    const entitiesSeen = [];
+    for (idx in relationships) {
         const relationshipType = relationships[idx].relationshipType;
         const ownerSide = relationships[idx].ownerSide;
         const otherEntityName = relationships[idx].otherEntityName;
@@ -57,12 +59,16 @@ currentAccount: any;
         const otherEntityField = relationships[idx].otherEntityField;
         const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
         const relationshipRequired = relationships[idx].relationshipRequired;
-        if(otherEntityName !== 'company'){
+        
+        if(otherEntityName !== 'company' && !entitiesSeen.includes(otherEntityNameCapitalized)){
+            entitiesSeen.push(otherEntityNameCapitalized);
         _%>
 
     <%= otherEntityNamePlural %> : <%=otherEntityNameCapitalized %>[];
     <%_ } }_%>
     @ViewChild(NgForm) searchForm: NgForm;
+    searchCardIsCollapsed: boolean = false;
+    private destroySubject :Subject<any>;
     <%_ } _%>
 
     constructor(
@@ -76,7 +82,9 @@ currentAccount: any;
         <%_ } _%>
         private router: Router,
         private eventManager: JhiEventManager,
-        <%_ for (idx in relationships) {
+        <%_ 
+        const entitiesSeen = [];
+        for (idx in relationships) {
             const relationshipType = relationships[idx].relationshipType;
             const ownerSide = relationships[idx].ownerSide;
             const otherEntityName = relationships[idx].otherEntityName;
@@ -88,22 +96,27 @@ currentAccount: any;
             const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
             const otherEntityField = relationships[idx].otherEntityField;
             const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-            const relationshipRequired = relationships[idx].relationshipRequired;  if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){ _%>
+            const relationshipRequired = relationships[idx].relationshipRequired;  if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company' && !entitiesSeen.includes(otherEntityNameCapitalized)){ 
+                entitiesSeen.push(otherEntityNameCapitalized);
+                _%>
         private <%= otherEntityName %>Service: <%= otherEntityNameCapitalized %>Service,
         <%_ }} _%>
 
         private <%= entityInstance %>PopupService: <%= entityAngularName %>PopupService
     ) {
+        this.destroySubject = new Subject();
         <%_ if (databaseType !== 'cassandra') { _%>
         this.itemsPerPage = ITEMS_PER_PAGE;
-        this.routeData = this.activatedRoute.data.subscribe((data) => {
+        this.routeData = this.activatedRoute.data.takeUntil(this.destroySubject).subscribe((data) => {
             this.page = data.pagingParams.page;
             this.previousPage = data.pagingParams.page;
             this.reverse = data.pagingParams.ascending;
             this.predicate = data.pagingParams.predicate;
 
         });
-        <%_ for (idx in relationships) {
+        <%_ 
+        const entitiesSeen = [];
+        for (idx in relationships) {
                 const relationshipType = relationships[idx].relationshipType;
                 const ownerSide = relationships[idx].ownerSide;
                 const otherEntityName = relationships[idx].otherEntityName;
@@ -115,19 +128,22 @@ currentAccount: any;
                 const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
                 const otherEntityField = relationships[idx].otherEntityField;
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
-                const relationshipRequired = relationships[idx].relationshipRequired;    if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){_%>
+                const relationshipRequired = relationships[idx].relationshipRequired;    if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company' && !entitiesSeen.includes(otherEntityNameCapitalized)){
+                    entitiesSeen.push(otherEntityNameCapitalized);
+                    _%>
         this.<%= otherEntityNamePlural %> =[];
        <%_ }} _%>
 
         this.<%= entityInstance %>Search = new <%= entityAngularName %>Search();
+
 
         <%_ if (searchEngine === 'elasticsearch') { _%>
          <%_ for (idx in fields) {
              const fieldName = fields[idx].fieldName;
              const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
           _%>
-        this.<%= entityInstance %>Search.<%=fieldName%> = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= fieldName %>'] ?
-                        this.activatedRoute.snapshot.params[' <%= fieldName %>'] : '';
+        this.<%= entityInstance %>Search.<%=fieldName%> = this.activatedRoute.snapshot && this.activatedRoute.snapshot.queryParams['<%= fieldName %>'] ?
+                        this.activatedRoute.snapshot.queryParams['<%= fieldName %>'] : '';
          <%_ } _%>
          <%_ for (idx in relationships) {
                        const relationshipType = relationships[idx].relationshipType;
@@ -138,8 +154,8 @@ currentAccount: any;
                        const relationshipFieldName = relationships[idx].relationshipFieldName;
                        const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;  if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') &&  otherEntityName !== 'company'){
                    _%>
-        this.<%= entityInstance %>Search.<%=relationshipFieldName%>Id = this.activatedRoute.snapshot && this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] ?
-                         this.activatedRoute.snapshot.params['<%= relationshipFieldName %>Id'] : '';
+        this.<%= entityInstance %>Search.<%=relationshipFieldName%>Id = this.activatedRoute.snapshot && this.activatedRoute.snapshot.queryParams['<%= relationshipFieldName %>Id'] ?
+                         this.activatedRoute.snapshot.queryParams['<%= relationshipFieldName %>Id'] : '';
          <%_ }} _%>
         <%_ } _%>
         <%_ } _%>
@@ -171,7 +187,7 @@ currentAccount: any;
             <%_ }} _%>
          };
 
-        this.<%= entityInstance %>Service.searchExample(obj).subscribe(
+        this.<%= entityInstance %>Service.searchExample(obj).takeUntil(this.destroySubject).subscribe(
           (res: HttpResponse<<%= entityAngularName %>[]>) => this.onSuccess(res.body, res.headers),
           (res: HttpErrorResponse) => this.onError(res.message)
         );

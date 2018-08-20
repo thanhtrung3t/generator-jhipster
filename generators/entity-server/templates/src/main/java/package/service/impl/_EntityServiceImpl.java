@@ -225,7 +225,7 @@ public class <%= serviceClassName %><% if (service === 'serviceImpl') { %> imple
                  boolQueryBuilder.must(QueryBuilders.wildcardQuery("<%=fieldName%>", "*"+searchDto.get<%=fieldInJavaBeanMethod%>()+"*"));
             }
             <%_ } else {_%>
-                if(searchDto.get<%=fieldInJavaBeanMethod%>()) !=null){
+                if(searchDto.get<%=fieldInJavaBeanMethod%>() !=null){
                 boolQueryBuilder.must(QueryBuilders.matchQuery("<%=fieldName%>",searchDto.get<%=fieldInJavaBeanMethod%>()));
             }
             <%_ } _%>

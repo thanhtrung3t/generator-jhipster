@@ -26,8 +26,8 @@ const hasRelationshipWithCompanys = query.hasRelationshipWithCompanys;
 const isCompanyRelationships = query.isCompanyRelationships;
 let hasManyToMany = query.hasManyToMany;
 _%>
-import { Component, OnInit<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
-
+import { Component, OnInit,OnDestroy<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
+import {Subject} from 'rxjs/Subject';
 import {Principal} from '../../shared/';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -69,9 +69,10 @@ Object.keys(differentRelationships).forEach(key => {
     selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>-update',
     templateUrl: './<%= entityFileName %>-update.component.html'
 })
-export class <%= entityAngularName %>UpdateComponent implements OnInit {
+export class <%= entityAngularName %>UpdateComponent implements OnInit, OnDestroy  {
 
     private _<%= entityInstance %>: <%= entityAngularName %>;
+    destroySubject :Subject<any>;
     isSaving: boolean;
     private currentAccount : any;
     <%_
@@ -113,11 +114,12 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         <%_ } _%>
         private route: ActivatedRoute
     ) {
+      this.destroySubject = new Subject<any>();
     }
 
     ngOnInit() {
         this.isSaving = false;
-        this.route.data.subscribe(({<%= entityInstance %>}) => {
+        this.route.data.takeUntil(this.destroySubject).subscribe(({<%= entityInstance %>}) => {
             this.<%= entityInstance %> = <%= entityInstance %>;
         });
         this.principal.identity().then((account) => {
@@ -178,7 +180,7 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
     }
 
     private subscribeToSaveResponse(result: Observable<HttpResponse<<%= entityAngularName %>>>) {
-        result.subscribe((res: HttpResponse<<%= entityAngularName %>>) =>
+        result.takeUntil(this.destroySubject).subscribe((res: HttpResponse<<%= entityAngularName %>>) =>
             this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
     }
 
@@ -206,6 +208,7 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
     track<%= otherEntityNameCapitalized %>ById(index: number, item: <%= relationships[idx].otherEntityAngularName %>) {
         return item.id;
     }
+    
     <%_ entitiesSeen.push(otherEntityNameCapitalized); } } _%>
     <%_ if (hasManyToMany) { _%>
 
@@ -232,5 +235,9 @@ export class <%= entityAngularName %>UpdateComponent implements OnInit {
         if (['Instant', 'ZonedDateTime'].includes(fieldType)) { _%>
         this.<%= fieldName %> = moment(<%= entityInstance %>.<%= fieldName %>).format(DATE_TIME_FORMAT);
      <%_ } } _%>
+    }
+    ngOnDestroy() {
+        this.destroySubject.next();
+        this.destroySubject.complete();
     }
 }

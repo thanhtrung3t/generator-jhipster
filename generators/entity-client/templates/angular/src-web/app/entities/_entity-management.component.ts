@@ -18,6 +18,7 @@
 -%>
 import { Component, OnInit, OnDestroy,ViewChild } from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import {Subject} from 'rxjs/Subject';
 <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
 import { ActivatedRoute, Router } from '@angular/router';
 import {NgForm} from '@angular/forms';
@@ -65,7 +66,9 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
         this.principal.identity().then((account) => {
             this.currentAccount = account;
             this.loadAll();
-            <%_ for (idx in relationships) {
+            <%_ 
+            let entitiesSeen = [];
+            for (idx in relationships) {
                 const relationshipType = relationships[idx].relationshipType;
                 const ownerSide = relationships[idx].ownerSide;
                 const otherEntityName = relationships[idx].otherEntityName;
@@ -79,16 +82,19 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
                 const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
                 const relationshipRequired = relationships[idx].relationshipRequired;
                 const hasRelationshipWithCompany = relationships[idx].hasRelationshipWithCompany;
-                if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') && (hasRelationshipWithCompany)){
+                if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') && (hasRelationshipWithCompany)  && !entitiesSeen.includes(otherEntityNameCapitalized)){
+                    entitiesSeen.push(otherEntityNameCapitalized);
                     _%>
-            this.<%= otherEntityName %>Service.query({"companyId.equals": this.currentAccount.companyId,"pageSize":ITEMS_QUERY_ALL }).subscribe(
+            this.<%= otherEntityName %>Service.query({"companyId.equals": this.currentAccount.companyId,"pageSize":ITEMS_QUERY_ALL }).takeUntil(this.destroySubject).subscribe(
                 (res: HttpResponse<<%=otherEntityNameCapitalized%>[]>) => this.<%= otherEntityNamePlural %> = res.body,
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
                 <%_} } _%>
         });
         this.registerChangeIn<%= entityClassPlural %>();
-        <%_ for (idx in relationships) {
+        <%_ 
+         entitiesSeen = [];
+        for (idx in relationships) {
             const relationshipType = relationships[idx].relationshipType;
             const ownerSide = relationships[idx].ownerSide;
             const otherEntityName = relationships[idx].otherEntityName;
@@ -103,9 +109,10 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
             const relationshipRequired = relationships[idx].relationshipRequired;
             const otherEntityData = relationships[idx].otherEntityData;
             const hasRelationshipWithCompany = relationships[idx].hasRelationshipWithCompany;
-                if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one')&&  (!hasRelationshipWithCompany && otherEntityName !== 'company')){
-            _%>
-        this.<%= otherEntityName %>Service.query().subscribe(
+                if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one')&&  (!hasRelationshipWithCompany && otherEntityName !== 'company') && !entitiesSeen.includes(otherEntityNameCapitalized)){
+                    entitiesSeen.push(otherEntityNameCapitalized);
+           _%>
+        this.<%= otherEntityName %>Service.query().takeUntil(this.destroySubject).subscribe(
             (res: HttpResponse<<%=otherEntityNameCapitalized%>[]>) => this.<%= otherEntityNamePlural %> = res.body,
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -114,11 +121,42 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+        this.destroySubject.next();
+        this.destroySubject.complete();
+        
     }
 
+   
     trackId(index: number, item: <%= entityAngularName %>) {
         return item.id;
     }
+
+    <%_ 
+    entitiesSeen = [];
+    for (idx in relationships) {
+        const relationshipType = relationships[idx].relationshipType;
+        const ownerSide = relationships[idx].ownerSide;
+        const otherEntityName = relationships[idx].otherEntityName;
+        const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+        const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+        const relationshipName = relationships[idx].relationshipName;
+        const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+        const relationshipFieldName = relationships[idx].relationshipFieldName;
+        const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+        const otherEntityField = relationships[idx].otherEntityField;
+        const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+        const relationshipRequired = relationships[idx].relationshipRequired;
+        const otherEntityData = relationships[idx].otherEntityData;
+        const hasRelationshipWithCompany = relationships[idx].hasRelationshipWithCompany;
+            if(((relationshipType === 'one-to-one'  && ownerSide === true) || relationshipType === 'many-to-one') && !entitiesSeen.includes(otherEntityNameCapitalized)){
+                entitiesSeen.push(otherEntityNameCapitalized);
+        _%>
+    track<%= otherEntityNameCapitalized %>ById(index: number, item: <%= otherEntityNameCapitalized %>) {
+        return item.id;
+    }
+    <%_} } _%>
+
+    
     <%_ if (fieldsContainBlob) { _%>
 
     byteSize(field) {
@@ -177,4 +215,5 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
         this.<%= entityInstance%>PopupService
             .open(<%= entityAngularName %>DeleteDialogComponent as Component, id);
     }
+   
 }

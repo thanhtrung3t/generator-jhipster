@@ -138,7 +138,7 @@ limitations under the License.
                     <%_ if (dto === 'no') { _%>
                 <div class="form-group row">
                     <label class="col-md-2 col-form-label" for="field_<%= relationshipName %>"
-                           jhiTranslate="<%= translationKey %>">><%= relationshipNameHumanized %>:</label>
+                           jhiTranslate="<%= translationKey %>"><%= relationshipNameHumanized %>:</label>
                     <div class="col-md-4">
                     <select class="form-control" id="field_<%= relationshipName %>" name="<%= relationshipName %>" [(ngModel)]="<%= entityInstance %>Search.<%=relationshipFieldName %>" >
 
@@ -151,11 +151,11 @@ limitations under the License.
                     <%_ } else { _%>
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="field_<%= relationshipName %>"
-                       jhiTranslate="<%= translationKey %>">><%= relationshipNameHumanized %>:</label>
+                       jhiTranslate="<%= translationKey %>"><%= relationshipNameHumanized %>:</label>
                 <div class="col-md-4">
                     <select class="form-control" id="field_<%= relationshipName %>" name="<%= relationshipName %>" [(ngModel)]="<%= entityInstance %>Search.<%=relationshipFieldName %>Id">
                     <option [ngValue]="null"></option>
-                    <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=otherEntityNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.name}}</option>
+                    <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=otherEntityNamePlural %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.name}}</option>
                     </select>
                 </div>
             </div>
@@ -173,22 +173,11 @@ limitations under the License.
                     <%_ } else { _%>
                     <select class="form-control" id="field_<%= relationshipName %>" name="<%= relationshipName %>" [(ngModel)]="<%= entityInstance %>Search.<%=relationshipFieldName %>Id">
                     <option [ngValue]="null"></option>
-                    <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=relationshipFieldNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.<%=otherEntityField %>}}</option>
+                    <option [ngValue]="<%=otherEntityName %>Option.id" *ngFor="let <%=otherEntityName %>Option of <%=relationshipFieldNamePlural %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.<%=otherEntityField %>}}</option>
                     </select>
                     <%_ } _%>
                     </div>
                 </div>
-                <%_ } else if (relationshipType === 'many-to-many' && relationships[idx].ownerSide === true) { _%>
-            <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="field_<%= relationshipName %>"
-                       jhiTranslate="<%= translationKey %>">><%= relationshipNameHumanized %>:</label>
-                <div class="col-md-4">
-                    <label jhiTranslate="<%= translationKey %>" for="field_<%= relationshipName %>"><%= relationshipNameHumanized %></label>
-                    <select class="form-control" id="field_<%= relationshipName %>" multiple name="<%= relationshipName %>" [(ngModel)]="<%=entityInstance %>Search.<%=relationshipFieldNamePlural %>">
-                    <option [ngValue]="getSelected(<%=entityInstance %>.<%=relationshipFieldNamePlural %>, <%=otherEntityName %>Option)" *ngFor="let <%=otherEntityName %>Option of <%=otherEntityNamePlural.toLowerCase() %>; trackBy: track<%=otherEntityNameCapitalized %>ById">{{<%=otherEntityName %>Option.<%=otherEntityField %>}}</option>
-                    </select>
-                </div>
-            </div>
                 <%_ } _%>
                 <%_ } _%>
 

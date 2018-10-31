@@ -19,6 +19,10 @@
 import { Component, OnInit, OnDestroy,ViewChild } from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import {Subject} from 'rxjs/Subject';
+import { ConfirmationService } from '../../shared/alert/confirmation.service';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Page } from '../../shared/model/page.mode';
+import { SpinnerService } from '../../shared/util/spinner';
 <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
 import { ActivatedRoute, Router } from '@angular/router';
 import {NgForm} from '@angular/forms';
@@ -37,6 +41,7 @@ import { <%= entityAngularName %>Service } from '../../shared/service/<%= entity
 import { <%= entityAngularName %>DeleteDialogComponent } from './<%= entityFileName %>-delete-dialog.component';
 import { <% if (pagination !== 'no') { %>ITEMS_PER_PAGE, <% } %>Principal } from '../../shared';
 import {<%= entityAngularName %>Search} from '../../shared/model/<%= entityFileName %>.search.model';
+<%_ const keyPrefix = angularAppName + '.'+ entityTranslationKey; _%>
 <%_
 let hasRelationshipQuery = false;
 Object.keys(differentRelationships).forEach(key => {
@@ -57,16 +62,76 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
 <%- include('pagination-template', {toArrayString: toArrayString}); -%>
 
     <%_ } else if (pagination === 'infinite-scroll') { _%>
-<%- include('infinite-scroll-template', {toArrayString: toArrayString}); -%>
+<%- include('infinite-scroll-template', {toArrayString:  this.itemsPerPage = ITEMS_PER_PAGEtoArrayString}); -%>
     <%_ } else if (pagination === 'no') { _%>
 <%- include('no-pagination-template', {toArrayString: toArrayString}); -%>
     <%_ } _%>
     ngOnInit() {
+        this.columns = [
+            <%_ for (idx in fields) {
+            const fieldName = fields[idx].fieldName;
+            const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+            const fieldNameHumanized = fields[idx].fieldNameHumanized;
+            const fieldType = fields[idx].fieldType;
+            _%>
+            { name: '<%= keyPrefix %>.<%= fieldName %>', prop: '<%= fieldName %>' },
+            <%_ } _%>
+            <%_ for (idx in relationships) {
+                const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired;
+            const translationKey = `${keyPrefix}.${relationshipName}`; _%>
+            <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !== 'company') { _%>
 
+            { name: '<%= translationKey %>', prop: '<%=relationshipName %>DTO.name' },
+            <%_ } _%>
+            <%_ } _%>
+            { name: '', prop: '',type:'action',canAutoResize:true }
+        ];
+        this.customSortFn = event => {
+            const sort = event.sorts[0];
+
+            this.predicate = sort.prop;
+            <%_ for (idx in relationships) {
+                const relationshipType = relationships[idx].relationshipType;
+                const ownerSide = relationships[idx].ownerSide;
+                const otherEntityName = relationships[idx].otherEntityName;
+                const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+                const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+                const relationshipName = relationships[idx].relationshipName;
+                const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+                const relationshipFieldName = relationships[idx].relationshipFieldName;
+                const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+                const otherEntityField = relationships[idx].otherEntityField;
+                const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+                const relationshipRequired = relationships[idx].relationshipRequired;
+                const translationKey = `${keyPrefix}.${relationshipName}`; _%>
+                <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !== 'company') { _%>
+                    if(sort.prop === '<%=relationshipName %>DTO.name') {
+                        this.predicate = '<%=relationshipName %>.name';
+                    }
+                <%_ } _%>
+                <%_ } _%>
+
+            this.reverse = sort.dir;
+            this.searchInForm();
+        };
+        this.customSearchFn = callback => {
+            this.transition(callback);
+        };
         this.principal.identity().then((account) => {
             this.currentAccount = account;
-            this.loadAll();
-            <%_ 
+            //this.loadAll();
+            <%_
             let entitiesSeen = [];
             for (idx in relationships) {
                 const relationshipType = relationships[idx].relationshipType;
@@ -91,8 +156,7 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
             );
                 <%_} } _%>
         });
-        this.registerChangeIn<%= entityClassPlural %>();
-        <%_ 
+        <%_
          entitiesSeen = [];
         for (idx in relationships) {
             const relationshipType = relationships[idx].relationshipType;
@@ -120,18 +184,18 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.eventManager.destroy(this.eventSubscriber);
+
         this.destroySubject.next();
         this.destroySubject.complete();
-        
+
     }
 
-   
+
     trackId(index: number, item: <%= entityAngularName %>) {
         return item.id;
     }
 
-    <%_ 
+    <%_
     entitiesSeen = [];
     for (idx in relationships) {
         const relationshipType = relationships[idx].relationshipType;
@@ -156,7 +220,7 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
     }
     <%_} } _%>
 
-    
+
     <%_ if (fieldsContainBlob) { _%>
 
     byteSize(field) {
@@ -179,23 +243,20 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
     <%_ if (pagination !== 'no') { _%>
         <%_ if (databaseType !== 'cassandra') { _%>
     sort() {
-        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-        if (this.predicate !== 'id') {
-            result.push('id');
-        }
+        const result = [this.predicate + ',' + this.reverse ];
         return result;
     }
 
         <%_ } _%>
         <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
-    private onSuccess(data, headers) {
+    private onSuccess(data, headers, callback?) {
         <%_ if (databaseType !== 'cassandra') { _%>
-        this.links = this.parseLinks.parse(headers.get('link'));
-        this.totalItems = headers.get('X-Total-Count');
-        this.queryCount = this.totalItems;
-        // this.page = pagingParams.page;
         <%_ } _%>
-        this.<%= entityInstancePlural %> = data;
+        this.<%= entityInstancePlural %> = [...data];
+        this.page.totalElements = headers.get('X-Total-Count');
+        if (callback) {
+            callback();
+        }
     }
         <%_ } else if (pagination === 'infinite-scroll') { _%>
     private onSuccess(data, headers) {
@@ -211,9 +272,34 @@ export class <%= entityAngularName %>Component implements OnInit, OnDestroy {
         this.alertService.error(error.message, null, null);
     }
 
-    public deleteItem(id:number){
-        this.<%= entityInstance%>PopupService
-            .open(<%= entityAngularName %>DeleteDialogComponent as Component, id);
+
+
+    editItem(row: any) {
+        this.router.navigate([row.id, 'edit'], { relativeTo: this.activatedRoute });
     }
-   
+
+    deleteItem(row: any) {
+        this.confirmationService
+            .open({
+                i18nMessage:'<%= keyPrefix %>.delete.question',
+                i18nMessageParams:{id:row.id},
+                type: 'delete'
+            })
+            .then((modalRef: NgbModalRef) => {
+                modalRef.result.then( result => {
+                    if (result) {
+                        SpinnerService.start();
+                        this.<%= entityInstance%>Service
+                            .delete(row.id)
+                            .finally(() => {
+                                SpinnerService.stop();
+                            })
+                            .subscribe(() => {
+                                this.transition();
+                            });
+                    }
+                });
+            });
+    }
+
 }

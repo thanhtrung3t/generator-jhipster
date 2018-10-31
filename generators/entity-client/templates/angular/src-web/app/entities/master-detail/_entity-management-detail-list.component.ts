@@ -17,12 +17,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 limitations under the License.
 
 -%>
+<%_ const keyPrefix = angularAppName + '.'+ entityTranslationKey; _%>
 import { Component, OnInit,Input, OnDestroy,ViewChild } from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import {AlertService} from '../../shared/alert/alert-service';
 <%_ if (pagination === 'pagination' || pagination === 'pager') { _%>
     import { ActivatedRoute, Router } from '@angular/router';
     import {NgForm} from '@angular/forms';
+    import {Page} from '../../shared/model/page.mode';
     <%_ } else if (searchEngine === 'elasticsearch') { _%>
     import { ActivatedRoute } from '@angular/router';
     <%_ } _%>
@@ -79,6 +81,36 @@ export class <%= entityAngularName %>DetailListComponent implements OnInit, OnDe
     <%- include('no-pagination-template', {toArrayString: toArrayString}); -%>
     <%_ } _%>
     ngOnInit() {
+        this.columns = [
+            <%_ for (idx in fields) {
+            const fieldName = fields[idx].fieldName;
+            const fieldNameCapitalized = fields[idx].fieldNameCapitalized;
+            const fieldNameHumanized = fields[idx].fieldNameHumanized;
+            const fieldType = fields[idx].fieldType;
+            _%>
+            { name: '<%= keyPrefix %>.<%= fieldName %>', prop: '<%= fieldName %>' },
+            <%_ } _%>
+        <%_ for (idx in relationships) {
+            const relationshipType = relationships[idx].relationshipType;
+            const ownerSide = relationships[idx].ownerSide;
+            const otherEntityName = relationships[idx].otherEntityName;
+            const otherEntityNamePlural = relationships[idx].otherEntityNamePlural;
+            const otherEntityNameCapitalized = relationships[idx].otherEntityNameCapitalized;
+            const relationshipName = relationships[idx].relationshipName;
+            const relationshipNameHumanized = relationships[idx].relationshipNameHumanized;
+            const relationshipFieldName = relationships[idx].relationshipFieldName;
+            const relationshipFieldNamePlural = relationships[idx].relationshipFieldNamePlural;
+            const otherEntityField = relationships[idx].otherEntityField;
+            const otherEntityFieldCapitalized = relationships[idx].otherEntityFieldCapitalized;
+            const relationshipRequired = relationships[idx].relationshipRequired;
+            const translationKey = `${keyPrefix}.${relationshipName}`; _%>
+            <%_ if ((relationshipType === 'many-to-one' || (relationshipType === 'one-to-one' && ownerSide === true && otherEntityName === 'user'))&& otherEntityName !== 'company') { _%>
+
+            { name: '<%= translationKey %>', prop: '<%=relationshipName %>DTO.name' },
+            <%_ } _%>
+            <%_ } _%>
+        { name: '', prop: '',type:'action',canAutoResize:true }
+    ];
         if(this.<%=parentRelationshipName%>Id){
             this.<%= entityInstance %>Service.query({"<%=parentRelationshipName%>Id.equals":this.<%=parentRelationshipName%>Id, size: 10000}).subscribe((res: HttpResponse<<%= entityAngularName %>[]>) => { this.<%= entityInstancePlural %> = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
         }

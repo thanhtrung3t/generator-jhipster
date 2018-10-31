@@ -46,6 +46,8 @@ _%>
 
         <%_ }} _%>
     @Input() <%=parentRelationshipName%>Id: number;
+    columns = [];
+    page = new Page();
     constructor(
         private eventManager : JhiEventManager,
         private <%= entityInstance %>DetailPopupService :<%= entityAngularName %>DetailPopupService,

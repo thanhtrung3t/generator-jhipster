@@ -29,6 +29,7 @@ const variables = query.variables;
 let hasManyToMany = query.hasManyToMany;
 _%>
 import { Component, OnInit, OnDestroy<% if (fieldsContainImageBlob) { %>, ElementRef<% } %> } from '@angular/core';
+import {Subject} from 'rxjs/Subject';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 
@@ -68,6 +69,7 @@ import {<%= uniqueRel.otherEntityAngularName %>  } from '../../shared/model/<%= 
 export class <%= entityAngularName %>DetailUpdateComponent implements OnInit {
 
     <%= entityInstance %>: <%= entityAngularName %>;
+    destroySubject :Subject<any>;
     isSaving: boolean;
     <%_
     for (const idx in variables) { %>
@@ -106,6 +108,7 @@ export class <%= entityAngularName %>DetailUpdateComponent implements OnInit {
         <%_ } _%>
         private eventManager: JhiEventManager
     ) {
+        this.destroySubject = new Subject<any>();
     }
 
     ngOnInit() {

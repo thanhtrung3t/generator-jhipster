@@ -19,6 +19,8 @@ limitations under the License.
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { <%= angularXAppName %>SharedModule } from '../../shared';
+import {<%= angularXAppName %>SharedReusableModule} from '../../shared/shared-reusable-component.module';
+
 <%_ Object.keys(differentRelationships).forEach(key => {
     if (key === 'User') { _%>
         import { <%= angularXAppName %>AdminModule } from '../../admin/admin.module';
@@ -61,6 +63,7 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         <%= angularXAppName %>SharedModule,
+        <%= angularXAppName %>SharedReusableModule,
         <%_ Object.keys(differentRelationships).forEach(key => {
             if (key === 'User') { _%>
             <%= angularXAppName %>AdminModule,

@@ -166,9 +166,6 @@ public class <%= entityClass %>Resource {
      * @param pageable the pagination information<% } %>
      * @return the result of the search
      */
-    @GetMapping("/_search/<%= entityApiUrl %>")
-    @Timed<%- include('../../common/search_template', {viaService: viaService}); -%>
-
 
     @GetMapping("/_search_example/<%= entityApiUrl %>")
     @Timed<%- include('../../common/search_example_template', {viaService: viaService}); -%><% } %>

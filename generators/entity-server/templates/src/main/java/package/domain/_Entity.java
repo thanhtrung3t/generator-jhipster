@@ -112,7 +112,7 @@ import static org.springframework.data.couchbase.core.mapping.id.GenerationStrat
 
 <%_ } if (searchEngine === 'elasticsearch' && databaseType !== 'mongodb') { _%>
 @EntityListeners(ElasticSearchUpdater.class)
-@Document(indexName = "<%= entityInstance.toLowerCase() %>")
+@Document(indexName = vn.nextlogix.constant.Constant.ELASTIC_PREFIX_INDEX+"<%= entityInstance.toLowerCase() %>")
 <%_ } _%>
 public class <%= entityClass %> implements Serializable {
 
@@ -122,8 +122,8 @@ public class <%= entityClass %> implements Serializable {
     <%_ if (prodDatabaseType === 'mysql' || prodDatabaseType === 'mariadb') { _%>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     <%_ }  else { _%>
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_<%= entityTableName %>_id")
+    @SequenceGenerator(name = "seq_<%= entityTableName %>_id", allocationSize = 1, sequenceName = "seq_<%= entityTableName %>_id")
     <%_ } _%>
     private Long id;
 <% } if (databaseType === 'couchbase') { %>

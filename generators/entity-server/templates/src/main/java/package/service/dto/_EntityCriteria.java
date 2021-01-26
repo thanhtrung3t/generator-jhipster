@@ -41,6 +41,7 @@ import io.github.jhipster.service.filter.ZonedDateTimeFilter;<% } %>
             type: fieldType,
             fieldInJavaBeanMethod: field.fieldInJavaBeanMethod });
     }
+
   });
   relationships.forEach((relationship) => {
     const relationshipType = relationship.relationshipType;
@@ -59,7 +60,7 @@ _%>
  * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
  * fix type specific filters.
  */
-public class <%= entityClass %>Criteria implements Serializable {
+public class <%= entityClass %>Criteria implements Serializable<%_ if (hasRelationshipWithCompany === true) { _%>, vn.nextlogix.service.dto.CompanySearchCriteria<% } %>  {
 <%_ Object.keys(extraFilters).forEach((key) => {
         extraFilter = extraFilters[key]; _%>
     /**

@@ -77,15 +77,6 @@ public interface <%= entityClass %>Service {
      */
     void delete(<%= pkType %> id);<% if (searchEngine === 'elasticsearch') { %>
 
-    /**
-     * Search for the <%= entityInstance %> corresponding to the query.
-     *
-     * @param query the query of the search
-     * <% if (pagination !== 'no') { %>
-     * @param pageable the pagination information<% } %>
-     * @return the list of entities
-     */
-    <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> search(String query<% if (pagination !== 'no') { %>, Pageable pageable<% } %>);
 
     <% if (pagination !== 'no') { %>Page<<%= instanceType %><% } else { %>List<<%= instanceType %><% } %>> searchExample( <%= entityClass %>SearchDTO searchDTO<% if (pagination !== 'no') { %>, Pageable pageable<% } %>);
     <% } %>

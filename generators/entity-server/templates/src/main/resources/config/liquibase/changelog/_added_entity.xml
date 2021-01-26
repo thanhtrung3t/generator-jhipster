@@ -135,6 +135,16 @@
         <dropDefaultValue tableName="<%= entityTableName %>" columnName="<%=fields[idx].fieldNameAsDatabaseColumn %>" columnDataType="datetime"/>
         <%_ }
         } _%>
+        <%_ if (prodDatabaseType === 'postgresql') { _%>
+        <createSequence
+            cycle="false"
+            incrementBy="1"
+            maxValue="9223372036854775807"
+            minValue="100000"
+            schemaName="public"
+
+            sequenceName="seq_<%= entityTableName %>_id"/>
+        <% } %>
         <% for (idx in relationships) {
             const relationshipType = relationships[idx].relationshipType,
             relationshipName = relationships[idx].relationshipName,
@@ -154,6 +164,7 @@
         </createTable>
 
         <addPrimaryKey columnNames="<%= getPluralColumnName(name) %>_id, <%= getPluralColumnName(relationshipName) %>_id" tableName="<%= joinTableName %>"/>
+
         <% } %><% } %>
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->

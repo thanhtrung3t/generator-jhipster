@@ -38,7 +38,7 @@
 /**
  * A DTO for the <%= entityClass %> entity.
  */
-public class <%= entityClass %>SearchDTO implements Serializable {
+public class <%= entityClass %>SearchDTO implements Serializable<%_ if (hasRelationshipWithCompany === true) { _%>, vn.nextlogix.service.dto.CompanySearchDTOInterface<% } %> {
 <% if (databaseType === 'sql') { %>
 private Long id;<% } %><% if (databaseType === 'mongodb' || databaseType === 'couchbase') { %>
 private String id;<% } %><% if (databaseType === 'cassandra') { %>
